@@ -1301,6 +1301,22 @@ class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
     def __ixor__(self, other): ...
     def __ior__(self, other): ...
 
+class recarray(ndarray):
+    def __new__(
+        cls: Type[_ArraySelf],
+        shape: Tuple[int, ...],
+        dtype: DtypeLike = ...,
+        formats: Optional[Sequence[DtypeLike]] = ...,
+        names: Optional[Tuple[str, ...]] = ...,
+        buf: Optional[_BufferType] = ...,
+        titles: Optional[Tuple[str, ...]] = ...,
+        byteorder: Optional[str] = ...,
+        alligned: bool = ...,
+        strides: Optional[Tuple[int, ...]] = ...,
+        offset: int = ...,
+        order: str = ...
+    ) -> _ArraySelf: ...
+
 # NOTE: while `np.generic` is not technically an instance of `ABCMeta`,
 # the `@abstractmethod` decorator is herein used to (forcefully) deny
 # the creation of `np.generic` instances.
