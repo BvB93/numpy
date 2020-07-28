@@ -11,13 +11,6 @@ from numpy.lib.index_tricks import (
     index_exp, ndindex, r_, s_, ix_
     )
 
-# np.float128 is not available on all platforms
-try:
-    from numpy import float128
-    FLOAT128_EX = None
-except ImportError as ex:
-    FLOAT128_EX = ex
-
 
 class TestRavelUnravelIndex:
     def test_basic(self):
@@ -262,23 +255,22 @@ class TestGrid:
         assert_(grid32.dtype == np.float64)
         assert_array_almost_equal(grid64, grid32)
 
-    @pytest.mark.skipif(FLOAT128_EX, reason=str(FLOAT128_EX))
     def test_accepts_npfloating128(self):
         # regression tests for #16945
         grid64 = mgrid[0.1:0.33:0.1,]
-        grid128 = mgrid[np.float128(0.1):np.float128(0.33):np.float128(0.1),]
-        assert_(grid128.dtype == np.float128)
+        grid128 = mgrid[np.longdouble(0.1):np.longdouble(0.33):np.longdouble(0.1),]
+        assert_(grid128.dtype == np.longdouble)
         assert_array_almost_equal(grid64, grid128)
 
-        grid128c_a = mgrid[0:np.float128(1):3.4j]
-        grid128c_b = mgrid[0:np.float128(1):3.4j,]
-        assert_(grid128c_a.dtype == grid128c_b.dtype == np.float128)
+        grid128c_a = mgrid[0:np.longdouble(1):3.4j]
+        grid128c_b = mgrid[0:np.longdouble(1):3.4j,]
+        assert_(grid128c_a.dtype == grid128c_b.dtype == np.longdouble)
         assert_array_almost_equal(grid128c_a, grid128c_b[0])
 
         # different code path for single slice
         grid64 = mgrid[0.1:0.33:0.1]
-        grid128 = mgrid[np.float128(0.1):np.float128(0.33):np.float128(0.1)]
-        assert_(grid128.dtype == np.float128)
+        grid128 = mgrid[np.longdouble(0.1):np.longdouble(0.33):np.longdouble(0.1)]
+        assert_(grid128.dtype == np.longdouble)
         assert_array_almost_equal(grid64, grid128)
 
     def test_accepts_npcomplexfloating(self):
