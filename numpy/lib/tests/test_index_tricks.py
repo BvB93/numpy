@@ -264,11 +264,16 @@ class TestGrid:
 
     @pytest.mark.skipif(FLOAT128_EX, reason=str(FLOAT128_EX))
     def test_accepts_npfloating128(self):
-        # regression test for #16945
+        # regression tests for #16945
         grid64 = mgrid[0.1:0.33:0.1,]
         grid128 = mgrid[np.float128(0.1):np.float128(0.33):np.float128(0.1),]
         assert_(grid128.dtype == np.float128)
         assert_array_almost_equal(grid64, grid128)
+
+        grid128c_a = mgrid[0:np.float128(1):3.4j]
+        grid128c_b = mgrid[0:np.float128(1):3.4j,]
+        assert_(grid128c_a.dtype == grid128c_b.dtype == np.float128)
+        assert_array_almost_equal(grid128c_a, grid128c_b[0])
 
         # different code path for single slice
         grid64 = mgrid[0.1:0.33:0.1]
@@ -285,6 +290,11 @@ class TestGrid:
         # different code path for single slice
         assert_array_almost_equal(
             mgrid[0.1:0.3:3j], mgrid[0.1:0.3:np.complex64(3j)]
+        )
+
+        # Related to #16945
+        assert_array_almost_equal(
+            mgrid[0.1:0.3:3.3j], mgrid[0.1:0.3:3.3j,][0],
         )
 
 class TestConcatenator:
