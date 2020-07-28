@@ -201,8 +201,8 @@ class nd_grid:
                 length = int(step)
                 if step != 1:
                     step = (key.stop-start)/float(step-1)
-                stop = key.stop + step
-                return _nx.arange(0, length, 1, float)*step + start
+                typ = _nx.result_type(start, stop, step)
+                return _nx.arange(0, length, 1, dtype=typ)*step + start
             else:
                 return _nx.arange(start, stop, step)
 
