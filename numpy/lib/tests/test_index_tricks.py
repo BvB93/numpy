@@ -11,6 +11,13 @@ from numpy.lib.index_tricks import (
     index_exp, ndindex, r_, s_, ix_
     )
 
+# np.float128 is not available on all platforms
+try:
+    from numpy import float128
+    FLOAT128_EX = None
+except ImportError as ex:
+    FLOAT128_EX = ex
+
 
 class TestRavelUnravelIndex:
     def test_basic(self):
@@ -254,6 +261,20 @@ class TestGrid:
         grid32 = mgrid[np.float32(0.1):np.float32(0.33):np.float32(0.1)]
         assert_(grid32.dtype == np.float64)
         assert_array_almost_equal(grid64, grid32)
+
+    @pytest.mark.skipif(FLOAT128_EX, reason=str(FLOAT128_EX))
+    def test_accepts_npfloating128(self):
+        # regression test for #16945
+        grid64 = mgrid[0.1:0.33:0.1,]
+        grid128 = mgrid[np.float128(0.1):np.float128(0.33):np.float128(0.1),]
+        assert_(grid128.dtype == np.float128)
+        assert_array_almost_equal(grid64, grid128)
+
+        # different code path for single slice
+        grid64 = mgrid[0.1:0.33:0.1]
+        grid128 = mgrid[np.float128(0.1):np.float128(0.33):np.float128(0.1)]
+        assert_(grid128.dtype == np.float128)
+        assert_array_almost_equal(grid64, grid128)
 
     def test_accepts_npcomplexfloating(self):
         # Related to #16466

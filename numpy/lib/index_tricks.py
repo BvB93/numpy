@@ -147,24 +147,25 @@ class nd_grid:
     def __getitem__(self, key):
         try:
             size = []
-            typ = int
+            # Mimick the behavior of `np.arange` and use a data type
+            # which is at least as large as `int` / `np.long`
+            num_list = [0]
             for k in range(len(key)):
                 step = key[k].step
                 start = key[k].start
+                stop = key[k].stop
                 if start is None:
                     start = 0
                 if step is None:
                     step = 1
                 if isinstance(step, (_nx.complexfloating, complex)):
                     size.append(int(abs(step)))
-                    typ = float
+                    step = 0.0  # random float to-be passed to `result_type()`
                 else:
                     size.append(
-                        int(math.ceil((key[k].stop - start)/(step*1.0))))
-                if (isinstance(step, (_nx.floating, float)) or
-                        isinstance(start, (_nx.floating, float)) or
-                        isinstance(key[k].stop, (_nx.floating, float))):
-                    typ = float
+                        int(math.ceil((stop - start) / (step*1.0))))
+                num_list += [start, stop, step]
+            typ = _nx.result_type(*num_list)
             if self.sparse:
                 nn = [_nx.arange(_x, dtype=_t)
                         for _x, _t in zip(size, (typ,)*len(size))]
@@ -528,7 +529,7 @@ class CClass(AxisConcatenator):
     useful because of its common occurrence. In particular, arrays will be
     stacked along their last axis after being upgraded to at least 2-D with
     1's post-pended to the shape (column vectors made out of 1-D arrays).
-    
+
     See Also
     --------
     column_stack : Stack 1-D arrays as columns into a 2-D array.
@@ -613,7 +614,7 @@ class ndindex:
     Parameters
     ----------
     shape : ints, or a single tuple of ints
-        The size of each dimension of the array can be passed as 
+        The size of each dimension of the array can be passed as
         individual parameters or as the elements of a tuple.
 
     See Also
