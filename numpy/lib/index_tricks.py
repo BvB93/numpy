@@ -197,8 +197,8 @@ class nd_grid:
             if start is None:
                 start = 0
             if isinstance(step, (_nx.complexfloating, complex)):
-                step = abs(step)
-                length = int(step)
+                # Prevent the (potential) creation of integer arrays
+                step = length = _nx.floor(abs(step))
                 if step != 1:
                     step = (key.stop-start)/float(step-1)
                 typ = _nx.result_type(start, stop, step)
