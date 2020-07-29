@@ -159,8 +159,8 @@ class nd_grid:
                 if step is None:
                     step = 1
                 if isinstance(step, (_nx.complexfloating, complex)):
-                    size.append(int(abs(step)))
-                    step = 0.0  # random float to-be passed to `result_type()`
+                    step = abs(step)
+                    size.append(int(step))
                 else:
                     size.append(
                         int(math.ceil((stop - start) / (step*1.0))))

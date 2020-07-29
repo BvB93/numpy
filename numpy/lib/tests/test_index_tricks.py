@@ -289,6 +289,9 @@ class TestGrid:
             mgrid[0.1:0.3:3.3j], mgrid[0.1:0.3:3.3j,][0],
         )
 
+        assert_(mgrid[0:1:np.clongdouble(1)].dtype.type is np.longdouble)
+
+
 class TestConcatenator:
     def test_1d(self):
         assert_array_equal(r_[1, 2, 3, 4, 5, 6], np.array([1, 2, 3, 4, 5, 6]))
