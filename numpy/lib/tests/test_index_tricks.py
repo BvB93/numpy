@@ -255,7 +255,7 @@ class TestGrid:
         assert_(grid32.dtype == np.float64)
         assert_array_almost_equal(grid64, grid32)
 
-    def test_accepts_npfloating128(self):
+    def test_accepts_longdouble(self):
         # regression tests for #16945
         grid64 = mgrid[0.1:0.33:0.1,]
         grid128 = mgrid[np.longdouble(0.1):np.longdouble(0.33):np.longdouble(0.1),]
