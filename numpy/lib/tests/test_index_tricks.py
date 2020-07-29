@@ -289,7 +289,9 @@ class TestGrid:
             mgrid[0.1:0.3:3.3j], mgrid[0.1:0.3:3.3j,][0],
         )
 
-        assert_(mgrid[0:1:np.clongdouble(1)].dtype.type is np.longdouble)
+        # Ensures that `float_dtype` defaults to `float64` on Windows
+        float_dtype = np.result_type(int, np.longdouble)
+        assert_(mgrid[0:1:np.clongdouble(1)].dtype == float_dtype)
 
 
 class TestConcatenator:
