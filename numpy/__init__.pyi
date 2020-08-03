@@ -1,4 +1,5 @@
 import builtins
+import os
 import sys
 import datetime as dt
 from abc import abstractmethod
@@ -1314,8 +1315,24 @@ class recarray(ndarray):
         alligned: bool = ...,
         strides: Optional[_ShapeLike] = ...,
         offset: int = ...,
-        order: str = ...
+        order: str = ...,
     ) -> _ArraySelf: ...
+
+_MemMapMode = Literal[
+    "r", "r+", "w+", "c", "readonly","readwrite", "write", "copyonwrite"
+]
+
+class memmap(ndarray):
+    def __new__(
+        cls: Type[_ArraySelf],
+        filename: Union[str, bytes, os.PathLike, IO[bytes]],
+        dtype: DtypeLike = ...,
+        mode: _MemMapMode = ...,
+        offset: int = ...,
+        shape: Optional[_ShapeLike] = ...,
+        order: Optional[str] = ...,
+    ) -> _ArraySelf: ...
+    def flush(self) -> None: ...
 
 # NOTE: while `np.generic` is not technically an instance of `ABCMeta`,
 # the `@abstractmethod` decorator is herein used to (forcefully) deny
