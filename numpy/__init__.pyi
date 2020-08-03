@@ -1304,15 +1304,15 @@ class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
 class recarray(ndarray):
     def __new__(
         cls: Type[_ArraySelf],
-        shape: Tuple[int, ...],
+        shape: _ShapeLike,
         dtype: DtypeLike = ...,
         formats: Optional[Sequence[DtypeLike]] = ...,
-        names: Optional[Tuple[str, ...]] = ...,
+        names: Optional[Sequence[str]] = ...,
         buf: Optional[_BufferType] = ...,
-        titles: Optional[Tuple[str, ...]] = ...,
+        titles: Optional[Sequence[Any]] = ...,
         byteorder: Optional[str] = ...,
         alligned: bool = ...,
-        strides: Optional[Tuple[int, ...]] = ...,
+        strides: Optional[_ShapeLike] = ...,
         offset: int = ...,
         order: str = ...
     ) -> _ArraySelf: ...
