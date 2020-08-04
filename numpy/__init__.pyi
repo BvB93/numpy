@@ -1319,7 +1319,7 @@ class recarray(ndarray):
     ) -> _ArraySelf: ...
 
 _MemMapMode = Literal[
-    "r", "r+", "w+", "c", "readonly","readwrite", "write", "copyonwrite"
+    "r", "r+", "w+", "c", "readonly", "readwrite", "write", "copyonwrite"
 ]
 
 class memmap(ndarray):
