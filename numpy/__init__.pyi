@@ -1304,7 +1304,7 @@ class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
 
 class recarray(ndarray):
     def __new__(
-        cls: Type[_ArraySelf],
+        subtype: Type[_ArraySelf],
         shape: _ShapeLike,
         dtype: DtypeLike = ...,
         formats: Optional[Sequence[DtypeLike]] = ...,
@@ -1324,7 +1324,7 @@ _MemMapMode = Literal[
 
 class memmap(ndarray):
     def __new__(
-        cls: Type[_ArraySelf],
+        subtype: Type[_ArraySelf],
         filename: Union[str, bytes, os.PathLike, IO[bytes]],
         dtype: DtypeLike = ...,
         mode: _MemMapMode = ...,
