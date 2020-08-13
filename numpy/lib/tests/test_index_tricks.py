@@ -290,10 +290,9 @@ class TestGrid:
         assert_(grid64_a.dtype == grid64_b.dtype == np.float64)
         assert_array_equal(grid64_a, grid64_b)
 
-        float_type = np.result_type(int, np.longdouble)
         grid128_a = mgrid[0.1:0.3:np.clongdouble(3.3j)]
         grid128_b = mgrid[0.1:0.3:np.clongdouble(3.3j),][0]
-        assert_(grid128_a.dtype == grid128_b.dtype == float_type)
+        assert_(grid128_a.dtype == grid128_b.dtype == np.longdouble)
         assert_array_equal(grid64_a, grid64_b)
 
 
