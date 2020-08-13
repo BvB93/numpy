@@ -4,13 +4,14 @@ import datetime as dt
 from abc import abstractmethod
 
 from numpy.core._internal import _ctypes
-from numpy.typing import ArrayLike, DtypeLike, _Shape, _ShapeLike
+from numpy.typing import ArrayLike, DtypeLike, _Shape, _ShapeLike, _DispatchFunc
 
 from typing import (
     Any,
     ByteString,
     Callable,
     Container,
+    Collection,
     Callable,
     Dict,
     Generic,
@@ -507,6 +508,15 @@ class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
     def strides(self) -> _Shape: ...
     @strides.setter
     def strides(self, value: _ShapeLike): ...
+    # `func: _DispatchFunc[None]` ensures that the dispatch is never triggered for `ndarray`,
+    # thus sticking to the default behavior of the dispathed function
+    def __array_function__(
+        self,
+        func: _DispatchFunc[None],  # type: ignore
+        types: Collection[type],
+        args: Tuple[Any, ...],
+        kwargs: Dict[str, Any]
+    ) -> Any: ...
     # Many of these special methods are irrelevant currently, since protocols
     # aren't supported yet. That said, I'm adding them for completeness.
     # https://docs.python.org/3/reference/datamodel.html
