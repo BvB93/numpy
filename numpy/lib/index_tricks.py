@@ -198,10 +198,10 @@ class nd_grid:
                 start = 0
             if isinstance(step, (_nx.complexfloating, complex)):
                 # Prevent the (potential) creation of integer arrays
-                step = length = _nx.floor(abs(step))
+                step = length = int(abs(step))
                 if step != 1:
                     step = (key.stop-start)/float(step-1)
-                typ = _nx.result_type(start, stop, step)
+                typ = _nx.result_type(0.0, start, stop, step)
                 return _nx.arange(0, length, 1, dtype=typ)*step + start
             else:
                 return _nx.arange(start, stop, step)
