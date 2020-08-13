@@ -285,9 +285,16 @@ class TestGrid:
         )
 
         # Related to #16945
-        assert_array_equal(
-            mgrid[0.1:0.3:3.3j], mgrid[0.1:0.3:3.3j,][0],
-        )
+        grid64_a = mgrid[0.1:0.3:3.3j]
+        grid64_b = mgrid[0.1:0.3:3.3j,][0]
+        assert_(grid64_a.dtype == grid64_b.dtype == np.float64)
+        assert_array_equal(grid64_a, grid64_b)
+
+        float_type = np.result_type(int, np.longdouble)
+        grid128_a = mgrid[0.1:0.3:np.clongdouble(3.3j)]
+        grid128_b = mgrid[0.1:0.3:np.clongdouble(3.3j),][0]
+        assert_(grid128_a.dtype == grid128_b.dtype == float_type)
+        assert_array_equal(grid64_a, grid64_b)
 
 
 class TestConcatenator:
