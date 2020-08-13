@@ -91,6 +91,7 @@ Please see : https://numpy.org/devdocs/reference/arrays.dtypes.html
 
 """
 from ._array_like import _SupportsArray, ArrayLike
+from ._array_function import _SupportsArrayFunction, _DispatchFunc
 from ._shape import _Shape, _ShapeLike
 from ._dtype_like import DtypeLike
 
