@@ -22,9 +22,10 @@ CACHE_DIR = os.path.join(DATA_DIR, ".mypy_cache")
 
 
 def get_test_cases(directory):
+    valid_extensions = {".pyi", ".py"}
     for root, _, files in os.walk(directory):
         for fname in files:
-            if os.path.splitext(fname)[-1] == ".py":
+            if os.path.splitext(fname)[-1] in valid_extensions:
                 fullpath = os.path.join(root, fname)
                 # Use relative path for nice py.test name
                 relpath = os.path.relpath(fullpath, start=directory)
