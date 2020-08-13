@@ -147,7 +147,7 @@ class nd_grid:
     def __getitem__(self, key):
         try:
             size = []
-            # Mimick the behavior of `np.arange` and use a data type
+            # Mimic the behavior of `np.arange` and use a data type
             # which is at least as large as `np.int_`
             num_list = [0]
             for k in range(len(key)):
