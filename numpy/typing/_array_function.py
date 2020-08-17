@@ -21,6 +21,7 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
         @property
         def __name__(self) -> _ST_co:
             ...
+        __call__: Callable
 
     class _SupportsArrayFunction(Protocol[_T_co, _ST_contra]):
         def __array_function__(
