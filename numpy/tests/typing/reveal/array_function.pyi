@@ -9,6 +9,8 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Literal
 
+T = TypeVar("T")
+
 class TestCls:
     def __array_function__(
         self,
@@ -18,8 +20,6 @@ class TestCls:
         kwargs: Dict[str, Any],
     ) -> bool: ...
     def __array__(self, dtype: DtypeLike = ...) -> np.ndarray: ...
-
-T = TypeVar("T")
 
 class _AsArray(_DispatchFunc[Literal["asarray"]]):
     @overload
@@ -33,15 +33,14 @@ class _AsArray(_DispatchFunc[Literal["asarray"]]):
     def __call__(
         self, a: ArrayLike, dtype: DtypeLike = ..., order: Optional[str] = ...
     ) -> np.ndarray: ...
+asarray: _AsArray
 
-class TestFunc(_DispatchFunc[Literal["test_func"]]):
+class _TestFunc(_DispatchFunc[Literal["test_func"]]):
     @overload
     def __call__(self, a: _SupportsArrayFunction[T, Literal["test_func"]]) -> T: ...
     @overload
     def __call__(self, a: ArrayLike) -> np.ndarray: ...
-
-asarray: _AsArray
-test_func: TestFunc
+test_func: _TestFunc
 
 a = np.array([0])
 b = [0]
