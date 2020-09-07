@@ -8,9 +8,12 @@ import numpy as np
 
 try:
     import mypy.types
-    from mypy.types import Type
-    from mypy.plugin import Plugin, AnalyzeTypeContext
-    from mypy.nodes import MypyFile, ImportFrom, Statement
+    from mypy.types import Type, Instance, CallableType
+    from mypy.plugin import Plugin, AnalyzeTypeContext, ClassDefContext
+    from mypy.nodes import (
+        MypyFile, Import, ImportFrom, SymbolTableNode, FuncDef, ARG_POS,
+        MDEF, Block, Statement,
+    )
     from mypy.build import PRI_MED
 
     _HookFunc = t.Callable[[AnalyzeTypeContext], Type]
@@ -84,8 +87,42 @@ _EXTENDED_PRECISION_LIST: t.Final = _get_extended_precision_list()
 #: The name of the ctypes quivalent of `np.intp`
 _C_INTP: t.Final = _get_c_intp_name()
 
+#: A dictionary mapping builtin scalar-types to their numpy equivalent
+_SCALAR_DICT: t.Final = {
+    "builtins.str": "numpy.str_",
+    "builtins.bytes": "numpy.bytes_",
+    "builtins.bool": "numpy.bool_",
+    "builtins.int": "numpy.int_",
+    "builtins.float": "numpy.float_",
+    "builtins.complex": "numpy.complex_",
+}
 
-def _hook(ctx: AnalyzeTypeContext) -> Type:
+
+def _array_protocol_hook(ctx: ClassDefContext) -> None:
+    """Attach the ``__array__`` method to the passed `ctx`."""
+    info = ctx.cls.info
+    if "__array__" in info.names:
+        return None
+
+    ret_name = _SCALAR_DICT[ctx.cls.fullname]
+    callable_obj = CallableType(
+        arg_types=[Instance(info, [])],
+        arg_kinds=[ARG_POS],
+        arg_names=["self"],
+        ret_type=ctx.api.named_type(ret_name),
+        fallback=ctx.api.named_type("function"),
+        name="__array__",
+    )
+
+    function = FuncDef("__array__", [], Block([]), callable_obj)
+    function.info = info
+    info.names["__array__"] = SymbolTableNode(
+        MDEF, function, plugin_generated=True
+    )
+    return None
+
+
+def _number_precision_hook(ctx: AnalyzeTypeContext) -> Type:
     """Replace a type-alias with a concrete ``NBitBase`` subclass."""
     typ, _, api = ctx
     name = typ.name.split(".")[-1]
@@ -127,7 +164,18 @@ if t.TYPE_CHECKING or MYPY_EX is None:
             For example: `numpy.int_`, `numpy.longlong` and `numpy.longdouble`.
             """
             if fullname in _PRECISION_DICT:
-                return _hook
+                return _number_precision_hook
+            return None
+
+        def get_customize_class_mro_hook(
+            self, fullname: str
+        ) -> None | t.Callable[[ClassDefContext], None]:
+            """Add the ``__array__`` protocol to all types in `_SCALAR_DICT`.
+
+            The return-type is set to `~typing.Any` until the method is actually called.
+            """
+            if fullname in _SCALAR_DICT:
+                return _array_protocol_hook
             return None
 
         def get_additional_deps(self, file: MypyFile) -> t.List[t.Tuple[int, str, int]]:
@@ -151,6 +199,13 @@ if t.TYPE_CHECKING or MYPY_EX is None:
                     file, "ctypes",
                     imports=[(_C_INTP, "_c_intp")],
                 )
+            elif file.fullname == "builtins":
+                # Add an `import numpy` statement to the `builtins` module
+                import_numpy = Import([("numpy", None)])
+                import_numpy.is_top_level = True
+                file.defs.insert(0, import_numpy)
+                file.imports.insert(0, import_numpy)
+
             return ret
 
     def plugin(version: str) -> t.Type[_NumpyPlugin]:
