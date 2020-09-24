@@ -22,7 +22,7 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
         typestr: str
         version: int
 
-    class _InterfaceDict(_InterfaceDictBase, required=False):
+    class _InterfaceDict(_InterfaceDictBase, total=False):
         descr: List[Union[
             Tuple[
                 Union[str, Tuple[str, str]],
