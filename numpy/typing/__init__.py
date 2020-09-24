@@ -89,6 +89,22 @@ Although this is valid Numpy code, the type checker will complain about it,
 since its usage is discouraged.
 Please see : https://numpy.org/devdocs/reference/arrays.dtypes.html
 
+InterfaceDict
+~~~~~~~~~~~~~
+
+A ``typing.TypedDict`` subclass representing valid return values of the
+``__array_interface__`` protocol.
+
+.. code-block:: python
+
+    >>> class Interface:
+    ...     @property
+    ...     def __array_interface__(self) -> InterfaceDict:
+    ...         pass
+
+This object is exposed as a measure of convience due to the invariant
+nature of TypedDicts
+
 """
 from ._shape import _Shape, _ShapeLike
 from ._dtype_like import DtypeLike
