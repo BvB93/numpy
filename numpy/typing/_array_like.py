@@ -34,9 +34,13 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
                 Optional[_Shape],
             ]
         ]]
+
+        # TODO: Allow `data` to be an object exposing the buffer interface
+        # once we have an appropiate protocol
         data: Optional[Tuple[int, bool]]
         strides: Optional[_Shape]
         mask: Optional["_SupportsArrayInterface"]
+        offset: int
 
     class _SupportsArrayInterface(Protocol):
         @property
