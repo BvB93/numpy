@@ -90,11 +90,16 @@ since its usage is discouraged.
 Please see : https://numpy.org/devdocs/reference/arrays.dtypes.html
 
 """
-from ._array_like import _SupportsArray, ArrayLike
 from ._shape import _Shape, _ShapeLike
 from ._dtype_like import DtypeLike
+from ._array_like import (
+    _InterfaceDict,
+    _SupportsArrayInterface,
+    _SupportsArrayStruct,
+    _SupportsArray,
+    ArrayLike,
+)
 
 from numpy._pytesttester import PytestTester
 test = PytestTester(__name__)
 del PytestTester
-
