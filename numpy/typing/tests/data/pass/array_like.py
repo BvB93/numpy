@@ -1,7 +1,15 @@
-from typing import Any, List, Optional
+import sys
+from typing import Any, List, Optional, Tuple, Any, Dict
 
 import numpy as np
-from numpy.typing import ArrayLike, DtypeLike, _SupportsArray
+from numpy.typing import (
+    ArrayLike,
+    DtypeLike,
+    InterfaceDict,
+    _SupportsArray,
+    _SupportsArrayStruct,
+    _SupportsArrayInterface,
+)
 
 x1: ArrayLike = True
 x2: ArrayLike = 5
@@ -37,3 +45,22 @@ a.__array__(dtype=np.int64)
 # array.
 object_array_scalar: Any = (i for i in range(10))
 np.array(object_array_scalar)
+
+
+class B:
+    @property
+    def __array_interface__(self) -> InterfaceDict: ...
+
+
+class C:
+    @property
+    def __array_struct__(self) -> Any: ...
+
+
+x14: ArrayLike = B()
+x14_1: _SupportsArrayInterface = B()
+x14_2: _SupportsArrayInterface = np.array(1)
+
+x15: ArrayLike = C()
+x15_1: _SupportsArrayStruct = C()
+x15_2: _SupportsArrayStruct = np.array(1)
