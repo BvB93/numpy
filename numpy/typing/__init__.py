@@ -93,7 +93,7 @@ Please see : https://numpy.org/devdocs/reference/arrays.dtypes.html
 from ._shape import _Shape, _ShapeLike
 from ._dtype_like import DtypeLike
 from ._array_like import (
-    _InterfaceDict,
+    InterfaceDict,
     _SupportsArrayInterface,
     _SupportsArrayStruct,
     _SupportsArray,

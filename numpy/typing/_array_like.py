@@ -22,7 +22,7 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
         typestr: str
         version: int
 
-    class _InterfaceDict(_InterfaceDictBase, total=False):
+    class InterfaceDict(_InterfaceDictBase, total=False):
         descr: List[Union[
             Tuple[
                 Union[str, Tuple[str, str]],
@@ -40,7 +40,7 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
 
     class _SupportsArrayInterface(Protocol):
         @property
-        def __array_interface__(self) -> _InterfaceDict: ...
+        def __array_interface__(self) -> InterfaceDict: ...
 
     class _SupportsArrayStruct(Protocol):
         @property
@@ -52,8 +52,7 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
         @overload
         def __array__(self, dtype: DtypeLike = ...) -> ndarray: ...
 else:
-    _InterfaceDictBase = Any
-    _InterfaceDict = Any
+    InterfaceDict = Any
     _SupportsArrayInterface = Any
     _SupportsArrayStruct = Any
     _SupportsArray = Any

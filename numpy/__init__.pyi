@@ -4,7 +4,7 @@ import datetime as dt
 from abc import abstractmethod
 
 from numpy.core._internal import _ctypes
-from numpy.typing import ArrayLike, DtypeLike, _Shape, _ShapeLike, _InterfaceDict
+from numpy.typing import ArrayLike, DtypeLike, _Shape, _ShapeLike, InterfaceDict
 
 from typing import (
     Any,
@@ -430,7 +430,7 @@ class _ArrayOrScalarCommon(
     # TODO: Add proper signatures
     def __getitem__(self, key) -> Any: ...
     @property
-    def __array_interface__(self) -> _InterfaceDict: ...
+    def __array_interface__(self) -> InterfaceDict: ...
     @property
     def __array_priority__(self): ...
     @property
