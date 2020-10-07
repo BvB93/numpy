@@ -378,7 +378,6 @@ matrixlib: Any
 max: Any
 may_share_memory: Any
 median: Any
-memmap: Any
 meshgrid: Any
 mgrid: Any
 min: Any
@@ -439,7 +438,6 @@ ravel_multi_index: Any
 real: Any
 real_if_close: Any
 rec: Any
-recarray: Any
 recfromcsv: Any
 recfromtxt: Any
 record: Any
