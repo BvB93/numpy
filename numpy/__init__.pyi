@@ -47,6 +47,36 @@ from numpy.typing._callable import (
     _NumberOp,
 )
 
+from numpy.typing._number_aliases import (
+    byte as byte,
+    short as short,
+    intc as intc,
+    intp as intp,
+    int0 as int0,
+    int_ as int_,
+    longlong as longlong,
+    ubyte as ubyte,
+    ushort as ushort,
+    uintc as uintc,
+    uintp as uintp,
+    uint0 as uint0,
+    uint as uint,
+    ulonglong as ulonglong,
+    half as half,
+    single as single,
+    double as double,
+    float_ as float_,
+    longfloat as longfloat,
+    longdouble as longdouble,
+    csingle as csingle,
+    singlecomplex as cinglecomplex,
+    cdouble as cdouble,
+    complex_ as complex_,
+    cfloat as cfloat,
+    clongfloat as clongfloat,
+    longcomplex as longcomplex,
+)
+
 from typing import (
     Any,
     ByteString,
@@ -285,29 +315,23 @@ broadcast_to: Any
 busday_count: Any
 busday_offset: Any
 busdaycalendar: Any
-byte: Any
 byte_bounds: Any
 bytes0: Any
 c_: Any
 can_cast: Any
 cast: Any
-cdouble: Any
-cfloat: Any
 chararray: Any
 clongdouble: Any
-clongfloat: Any
 column_stack: Any
 common_type: Any
 compare_chararrays: Any
 complex256: Any
-complex_: Any
 concatenate: Any
 conj: Any
 copy: Any
 copyto: Any
 corrcoef: Any
 cov: Any
-csingle: Any
 cumproduct: Any
 datetime_as_string: Any
 datetime_data: Any
@@ -323,7 +347,6 @@ digitize: Any
 disp: Any
 divide: Any
 dot: Any
-double: Any
 dsplit: Any
 dstack: Any
 ediff1d: Any
@@ -340,7 +363,6 @@ flip: Any
 fliplr: Any
 flipud: Any
 float128: Any
-float_: Any
 format_float_positional: Any
 format_float_scientific: Any
 format_parser: Any
@@ -358,7 +380,6 @@ geterr: Any
 geterrcall: Any
 geterrobj: Any
 gradient: Any
-half: Any
 hamming: Any
 hanning: Any
 histogram: Any
@@ -374,12 +395,8 @@ index_exp: Any
 info: Any
 inner: Any
 insert: Any
-int0: Any
-int_: Any
-intc: Any
 interp: Any
 intersect1d: Any
-intp: Any
 is_busday: Any
 iscomplex: Any
 iscomplexobj: Any
@@ -396,10 +413,6 @@ lexsort: Any
 load: Any
 loads: Any
 loadtxt: Any
-longcomplex: Any
-longdouble: Any
-longfloat: Any
-longlong: Any
 lookfor: Any
 mafromtxt: Any
 mask_indices: Any
@@ -491,10 +504,8 @@ seterrcall: Any
 seterrobj: Any
 setxor1d: Any
 shares_memory: Any
-short: Any
 show_config: Any
 sinc: Any
-single: Any
 singlecomplex: Any
 sort_complex: Any
 source: Any
@@ -514,18 +525,11 @@ triu_indices_from: Any
 typeDict: Any
 typecodes: Any
 typename: Any
-ubyte: Any
-uint: Any
-uint0: Any
-uintc: Any
-uintp: Any
-ulonglong: Any
 union1d: Any
 unique: Any
 unpackbits: Any
 unravel_index: Any
 unwrap: Any
-ushort: Any
 vander: Any
 vdot: Any
 vectorize: Any
