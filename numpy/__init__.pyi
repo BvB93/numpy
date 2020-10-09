@@ -47,7 +47,7 @@ from numpy.typing._callable import (
     _NumberOp,
 )
 
-from numpy.typing._dynamic_types import (
+from numpy.typing._platform_aliases import (
     byte as byte,
     short as short,
     intc as intc,
