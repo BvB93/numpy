@@ -7,6 +7,7 @@ from types import TracebackType
 from contextlib import ContextDecorator
 
 from numpy.core._internal import _ctypes
+
 from numpy.typing import (
     # Arrays
     ArrayLike,
@@ -107,11 +108,7 @@ from numpy.typing import (
     _ObjectCodes,
 
     # Ufuncs
-    _UFunc_Nin1_Nout1,
-    _UFunc_Nin2_Nout1,
-    _UFunc_Nin1_Nout2,
-    _UFunc_Nin2_Nout2,
-    _GUFunc_Nin2_Nout1,
+    _ufuncs,
 )
 
 from numpy.typing._callable import (
@@ -3440,111 +3437,98 @@ class ufunc:
     # This is None for ufuncs and a string for gufuncs.
     @property
     def signature(self) -> Optional[str]: ...
-    # The next four methods will always exist, but they will just
-    # raise a ValueError ufuncs with that don't accept two input
-    # arguments and return one output argument. Because of that we
-    # can't type them very precisely.
-    reduce: Any
-    accumulate: Any
-    reduce: Any
-    outer: Any
-    # Similarly at won't be defined for ufuncs that return multiple
-    # outputs, so we can't type it very precisely.
-    at: Any
 
-# Parameters: `__name__`, `ntypes` and `identity`
-absolute: _UFunc_Nin1_Nout1[L['absolute'], L[20], None]
-add: _UFunc_Nin2_Nout1[L['add'], L[22], L[0]]
-arccos: _UFunc_Nin1_Nout1[L['arccos'], L[8], None]
-arccosh: _UFunc_Nin1_Nout1[L['arccosh'], L[8], None]
-arcsin: _UFunc_Nin1_Nout1[L['arcsin'], L[8], None]
-arcsinh: _UFunc_Nin1_Nout1[L['arcsinh'], L[8], None]
-arctan2: _UFunc_Nin2_Nout1[L['arctan2'], L[5], None]
-arctan: _UFunc_Nin1_Nout1[L['arctan'], L[8], None]
-arctanh: _UFunc_Nin1_Nout1[L['arctanh'], L[8], None]
-bitwise_and: _UFunc_Nin2_Nout1[L['bitwise_and'], L[12], L[-1]]
-bitwise_not: _UFunc_Nin1_Nout1[L['invert'], L[12], None]
-bitwise_or: _UFunc_Nin2_Nout1[L['bitwise_or'], L[12], L[0]]
-bitwise_xor: _UFunc_Nin2_Nout1[L['bitwise_xor'], L[12], L[0]]
-cbrt: _UFunc_Nin1_Nout1[L['cbrt'], L[5], None]
-ceil: _UFunc_Nin1_Nout1[L['ceil'], L[7], None]
-conj: _UFunc_Nin1_Nout1[L['conjugate'], L[18], None]
-conjugate: _UFunc_Nin1_Nout1[L['conjugate'], L[18], None]
-copysign: _UFunc_Nin2_Nout1[L['copysign'], L[4], None]
-cos: _UFunc_Nin1_Nout1[L['cos'], L[9], None]
-cosh: _UFunc_Nin1_Nout1[L['cosh'], L[8], None]
-deg2rad: _UFunc_Nin1_Nout1[L['deg2rad'], L[5], None]
-degrees: _UFunc_Nin1_Nout1[L['degrees'], L[5], None]
-divide: _UFunc_Nin2_Nout1[L['true_divide'], L[11], None]
-divmod: _UFunc_Nin2_Nout2[L['divmod'], L[15], None]
-equal: _UFunc_Nin2_Nout1[L['equal'], L[23], None]
-exp2: _UFunc_Nin1_Nout1[L['exp2'], L[8], None]
-exp: _UFunc_Nin1_Nout1[L['exp'], L[10], None]
-expm1: _UFunc_Nin1_Nout1[L['expm1'], L[8], None]
-fabs: _UFunc_Nin1_Nout1[L['fabs'], L[5], None]
-float_power: _UFunc_Nin2_Nout1[L['float_power'], L[4], None]
-floor: _UFunc_Nin1_Nout1[L['floor'], L[7], None]
-floor_divide: _UFunc_Nin2_Nout1[L['floor_divide'], L[21], None]
-fmax: _UFunc_Nin2_Nout1[L['fmax'], L[21], None]
-fmin: _UFunc_Nin2_Nout1[L['fmin'], L[21], None]
-fmod: _UFunc_Nin2_Nout1[L['fmod'], L[15], None]
-frexp: _UFunc_Nin1_Nout2[L['frexp'], L[4], None]
-gcd: _UFunc_Nin2_Nout1[L['gcd'], L[11], L[0]]
-greater: _UFunc_Nin2_Nout1[L['greater'], L[23], None]
-greater_equal: _UFunc_Nin2_Nout1[L['greater_equal'], L[23], None]
-heaviside: _UFunc_Nin2_Nout1[L['heaviside'], L[4], None]
-hypot: _UFunc_Nin2_Nout1[L['hypot'], L[5], L[0]]
-invert: _UFunc_Nin1_Nout1[L['invert'], L[12], None]
-isfinite: _UFunc_Nin1_Nout1[L['isfinite'], L[20], None]
-isinf: _UFunc_Nin1_Nout1[L['isinf'], L[20], None]
-isnan: _UFunc_Nin1_Nout1[L['isnan'], L[20], None]
-isnat: _UFunc_Nin1_Nout1[L['isnat'], L[2], None]
-lcm: _UFunc_Nin2_Nout1[L['lcm'], L[11], None]
-ldexp: _UFunc_Nin2_Nout1[L['ldexp'], L[8], None]
-left_shift: _UFunc_Nin2_Nout1[L['left_shift'], L[11], None]
-less: _UFunc_Nin2_Nout1[L['less'], L[23], None]
-less_equal: _UFunc_Nin2_Nout1[L['less_equal'], L[23], None]
-log10: _UFunc_Nin1_Nout1[L['log10'], L[8], None]
-log1p: _UFunc_Nin1_Nout1[L['log1p'], L[8], None]
-log2: _UFunc_Nin1_Nout1[L['log2'], L[8], None]
-log: _UFunc_Nin1_Nout1[L['log'], L[10], None]
-logaddexp2: _UFunc_Nin2_Nout1[L['logaddexp2'], L[4], float]
-logaddexp: _UFunc_Nin2_Nout1[L['logaddexp'], L[4], float]
-logical_and: _UFunc_Nin2_Nout1[L['logical_and'], L[20], L[True]]
-logical_not: _UFunc_Nin1_Nout1[L['logical_not'], L[20], None]
-logical_or: _UFunc_Nin2_Nout1[L['logical_or'], L[20], L[False]]
-logical_xor: _UFunc_Nin2_Nout1[L['logical_xor'], L[19], L[False]]
-matmul: _GUFunc_Nin2_Nout1[L['matmul'], L[19], None]
-maximum: _UFunc_Nin2_Nout1[L['maximum'], L[21], None]
-minimum: _UFunc_Nin2_Nout1[L['minimum'], L[21], None]
-mod: _UFunc_Nin2_Nout1[L['remainder'], L[16], None]
-modf: _UFunc_Nin1_Nout2[L['modf'], L[4], None]
-multiply: _UFunc_Nin2_Nout1[L['multiply'], L[23], L[1]]
-negative: _UFunc_Nin1_Nout1[L['negative'], L[19], None]
-nextafter: _UFunc_Nin2_Nout1[L['nextafter'], L[4], None]
-not_equal: _UFunc_Nin2_Nout1[L['not_equal'], L[23], None]
-positive: _UFunc_Nin1_Nout1[L['positive'], L[19], None]
-power: _UFunc_Nin2_Nout1[L['power'], L[18], None]
-rad2deg: _UFunc_Nin1_Nout1[L['rad2deg'], L[5], None]
-radians: _UFunc_Nin1_Nout1[L['radians'], L[5], None]
-reciprocal: _UFunc_Nin1_Nout1[L['reciprocal'], L[18], None]
-remainder: _UFunc_Nin2_Nout1[L['remainder'], L[16], None]
-right_shift: _UFunc_Nin2_Nout1[L['right_shift'], L[11], None]
-rint: _UFunc_Nin1_Nout1[L['rint'], L[10], None]
-sign: _UFunc_Nin1_Nout1[L['sign'], L[19], None]
-signbit: _UFunc_Nin1_Nout1[L['signbit'], L[4], None]
-sin: _UFunc_Nin1_Nout1[L['sin'], L[9], None]
-sinh: _UFunc_Nin1_Nout1[L['sinh'], L[8], None]
-spacing: _UFunc_Nin1_Nout1[L['spacing'], L[4], None]
-sqrt: _UFunc_Nin1_Nout1[L['sqrt'], L[10], None]
-square: _UFunc_Nin1_Nout1[L['square'], L[18], None]
-subtract: _UFunc_Nin2_Nout1[L['subtract'], L[21], None]
-tan: _UFunc_Nin1_Nout1[L['tan'], L[8], None]
-tanh: _UFunc_Nin1_Nout1[L['tanh'], L[8], None]
-true_divide: _UFunc_Nin2_Nout1[L['true_divide'], L[11], None]
-trunc: _UFunc_Nin1_Nout1[L['trunc'], L[7], None]
-
-abs = absolute
+abs: _ufuncs.abs
+absolute: _ufuncs.absolute
+add: _ufuncs.add
+arccos: _ufuncs.arccos
+arccosh: _ufuncs.arccosh
+arcsin: _ufuncs.arcsin
+arcsinh: _ufuncs.arcsinh
+arctan: _ufuncs.arctan
+arctan2: _ufuncs.arctan2
+arctanh: _ufuncs.arctanh
+bitwise_and: _ufuncs.bitwise_and
+bitwise_not: _ufuncs.bitwise_not
+bitwise_or: _ufuncs.bitwise_or
+bitwise_xor: _ufuncs.bitwise_xor
+cbrt: _ufuncs.cbrt
+ceil: _ufuncs.ceil
+conj: _ufuncs.conj
+conjugate: _ufuncs.conjugate
+copysign: _ufuncs.copysign
+cos: _ufuncs.cos
+cosh: _ufuncs.cosh
+deg2rad: _ufuncs.deg2rad
+degrees: _ufuncs.degrees
+divide: _ufuncs.divide
+divmod: _ufuncs.divmod
+equal: _ufuncs.equal
+exp: _ufuncs.exp
+exp2: _ufuncs.exp2
+expm1: _ufuncs.expm1
+fabs: _ufuncs.fabs
+float_power: _ufuncs.float_power
+floor: _ufuncs.floor
+floor_divide: _ufuncs.floor_divide
+fmax: _ufuncs.fmax
+fmin: _ufuncs.fmin
+fmod: _ufuncs.fmod
+frexp: _ufuncs.frexp
+gcd: _ufuncs.gcd
+greater: _ufuncs.greater
+greater_equal: _ufuncs.greater_equal
+heaviside: _ufuncs.heaviside
+hypot: _ufuncs.hypot
+invert: _ufuncs.invert
+isfinite: _ufuncs.isfinite
+isinf: _ufuncs.isinf
+isnan: _ufuncs.isnan
+isnat: _ufuncs.isnat
+lcm: _ufuncs.lcm
+ldexp: _ufuncs.ldexp
+left_shift: _ufuncs.left_shift
+less: _ufuncs.less
+less_equal: _ufuncs.less_equal
+log: _ufuncs.log
+log10: _ufuncs.log10
+log1p: _ufuncs.log1p
+log2: _ufuncs.log2
+logaddexp: _ufuncs.logaddexp
+logaddexp2: _ufuncs.logaddexp2
+logical_and: _ufuncs.logical_and
+logical_not: _ufuncs.logical_not
+logical_or: _ufuncs.logical_or
+logical_xor: _ufuncs.logical_xor
+matmul: _ufuncs.matmul
+maximum: _ufuncs.maximum
+minimum: _ufuncs.minimum
+mod: _ufuncs.mod
+modf: _ufuncs.modf
+multiply: _ufuncs.multiply
+negative: _ufuncs.negative
+nextafter: _ufuncs.nextafter
+not_equal: _ufuncs.not_equal
+positive: _ufuncs.positive
+power: _ufuncs.power
+rad2deg: _ufuncs.rad2deg
+radians: _ufuncs.radians
+reciprocal: _ufuncs.reciprocal
+remainder: _ufuncs.remainder
+right_shift: _ufuncs.right_shift
+rint: _ufuncs.rint
+sign: _ufuncs.sign
+signbit: _ufuncs.signbit
+sin: _ufuncs.sin
+sinh: _ufuncs.sinh
+spacing: _ufuncs.spacing
+sqrt: _ufuncs.sqrt
+square: _ufuncs.square
+subtract: _ufuncs.subtract
+tan: _ufuncs.tan
+tanh: _ufuncs.tanh
+true_divide: _ufuncs.true_divide
+trunc: _ufuncs.trunc
 
 # Warnings
 class ModuleDeprecationWarning(DeprecationWarning): ...
