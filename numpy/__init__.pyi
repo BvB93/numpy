@@ -53,12 +53,14 @@ from typing import (
     Any,
     ByteString,
     Callable,
+    Collection,
     Container,
     Callable,
     Dict,
     Generic,
     IO,
     Iterable,
+    Iterator,
     List,
     Mapping,
     Optional,
@@ -993,6 +995,19 @@ _ArrayLikeIntOrBool = Union[
     Sequence[Sequence[Any]],  # TODO: wait for support for recursive types
 ]
 
+_IndexLike = Union[
+    SupportsIndex,
+    _ArrayLikeIntOrBool,
+    None,
+    slice,
+    ellipsis,
+]
+_IndexLikeND = Union[_IndexLike, Tuple[_IndexLike, ...]]
+_UFuncContext = Optional[Tuple[ufunc, Tuple[Any, ...], Optional[int]]]
+_UFuncMethods = Literal[
+    "__call__", "reduce", "reduceat", "accumulate", "outer", "inner"
+]
+
 _ArraySelf = TypeVar("_ArraySelf", bound=_ArrayOrScalarCommon)
 
 class _ArrayOrScalarCommon:
@@ -1059,17 +1074,16 @@ class _ArrayOrScalarCommon:
     def view(
         self, dtype: DTypeLike, type: Type[_NdArraySubClass]
     ) -> _NdArraySubClass: ...
-
-    # TODO: Add proper signatures
-    def __getitem__(self, key) -> Any: ...
+    # TODO: Annotate the `__array_interface__` return type via a `TypedDict`
     @property
-    def __array_interface__(self): ...
+    def __array_interface__(self) -> Dict[str, Any]: ...
     @property
-    def __array_priority__(self): ...
+    def __array_priority__(self) -> float: ...
     @property
-    def __array_struct__(self): ...
-    def __array_wrap__(array, context=...): ...
-    def __setstate__(self, __state): ...
+    def __array_struct__(self) -> Any: ...  # builtins.PyCapsule
+    def __array_wrap__(
+        self, __array: ndarray, __context: _UFuncContext = ...
+    ) -> ndarray: ...
     # a `bool_` is returned when `keepdims=True` and `self` is a 0d array
     @overload
     def all(
@@ -1444,6 +1458,9 @@ class _ArrayOrScalarCommon:
 _BufferType = Union[ndarray, bytes, bytearray, memoryview]
 _Casting = Literal["no", "equiv", "safe", "same_kind", "unsafe"]
 
+_SetState5Tup = Tuple[int, _Shape, dtype, bool, Union[bytes, List[Any]]]
+_SetState4Tup = Tuple[_Shape, dtype, bool, Union[bytes, List[Any]]]
+
 class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
     @property
     def base(self) -> Optional[ndarray]: ...
@@ -1459,6 +1476,33 @@ class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
     def imag(self: _ArraySelf) -> _ArraySelf: ...
     @imag.setter
     def imag(self, value: ArrayLike) -> None: ...
+    @property
+    def __array_finalize__(self) -> None: ...
+    def __array_prepare__(
+        self: _ArraySelf, __array: ndarray, __context: _UFuncContext = ...
+    ) -> _ArraySelf: ...
+    def __array_ufunc__(
+        self,
+        __ufunc: ufunc,
+        __method: _UFuncMethods,
+        __inputs:  Sequence[Any],
+        __kwargs: Mapping[str, Any],
+    ) -> Union[ndarray, generic]: ...
+    def __array_function__(
+        self,
+        func: Callable[..., Any],
+        types: Collection[type],
+        args: Sequence[Any],
+        kwargs: Mapping[str, Any],
+    ) -> Any: ...
+    def __reduce__(self: _ArraySelf) -> Tuple[
+        Callable[[Type[ndarray], _ShapeLike, DTypeLike], ndarray],
+        Tuple[Type[_ArraySelf], _Shape, bytes],
+        _SetState5Tup,
+    ]: ...
+    def __setstate__(
+        self,  __state: Union[_SetState5Tup, _SetState4Tup]
+    ) -> None: ...
     def __new__(
         cls: Type[_ArraySelf],
         shape: Sequence[int],
@@ -1475,11 +1519,11 @@ class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
     @property
     def shape(self) -> _Shape: ...
     @shape.setter
-    def shape(self, value: _ShapeLike): ...
+    def shape(self, value: _ShapeLike) -> None: ...
     @property
     def strides(self) -> _Shape: ...
     @strides.setter
-    def strides(self, value: _ShapeLike): ...
+    def strides(self, value: _ShapeLike) -> None: ...
     def byteswap(self: _ArraySelf, inplace: bool = ...) -> _ArraySelf: ...
     def fill(self, value: Any) -> None: ...
     @property
@@ -1568,16 +1612,16 @@ class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
         dtype: DTypeLike = ...,
         out: _NdArraySubClass = ...,
     ) -> _NdArraySubClass: ...
-    # Many of these special methods are irrelevant currently, since protocols
-    # aren't supported yet. That said, I'm adding them for completeness.
-    # https://docs.python.org/3/reference/datamodel.html
     def __int__(self) -> int: ...
     def __float__(self) -> float: ...
     def __complex__(self) -> complex: ...
     def __len__(self) -> int: ...
-    def __setitem__(self, key, value): ...
-    def __iter__(self) -> Any: ...
-    def __contains__(self, key) -> bool: ...
+    def __getitem__(
+        self, key: Union[str, Sequence[str], _IndexLikeND]
+    ) -> Union[generic, ndarray]: ...
+    def __setitem__(self, key: _IndexLike, value: ArrayLike) -> None: ...
+    def __iter__(self) -> Union[Iterator[generic], Iterator[ndarray]]: ...
+    def __contains__(self, key: object) -> bool: ...
     def __index__(self) -> int: ...
     def __matmul__(self, other: ArrayLike) -> Union[ndarray, generic]: ...
     # NOTE: `ndarray` does not implement `__imatmul__`
@@ -1639,12 +1683,17 @@ class ndarray(_ArrayOrScalarCommon, Iterable, Sized, Container):
 # See https://github.com/numpy/numpy-stubs/pull/80 for more details.
 
 _ScalarType = TypeVar("_ScalarType", bound=generic)
+_ScalarType2 = TypeVar("_ScalarType2", bound=generic)
 _NBit_co = TypeVar("_NBit_co", covariant=True, bound=NBitBase)
 _NBit_co2 = TypeVar("_NBit_co2", covariant=True, bound=NBitBase)
 
 class generic(_ArrayOrScalarCommon):
     @abstractmethod
     def __init__(self, *args: Any, **kwargs: Any) -> None: ...
+    def __reduce__(self: _ScalarType) -> Tuple[
+        Callable[[dtype[_ScalarType2], Any], _ScalarType2],
+        Tuple[dtype[_ScalarType], bytes],
+    ]: ...
     @property
     def base(self) -> None: ...
     @property
@@ -1664,6 +1713,12 @@ class generic(_ArrayOrScalarCommon):
         self: _ScalarType,
         __args: Union[Literal[0], Tuple[()], Tuple[Literal[0]]] = ...,
     ) -> Any: ...
+    @overload
+    def __getitem__(self: _ScalarType, key: Tuple[()]) -> _ScalarType: ...
+    @overload
+    def __getitem__(
+        self, key: Union[None, ellipsis, Tuple[Optional[ellipsis], ...]]
+    ) -> ndarray: ...
     def squeeze(
         self: _ScalarType, axis: Union[Literal[0], Tuple[()]] = ...
     ) -> _ScalarType: ...
