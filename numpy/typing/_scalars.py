@@ -1,6 +1,9 @@
-from typing import Union, Tuple, Any
+from typing import Union, Tuple, Any, TypeVar
 
 import numpy as np
+from numpy.typing import TimeUnit
+
+_Unit = TypeVar("_Unit", bound=TimeUnit)
 
 # NOTE: `_StrLike` and `_BytesLike` are pointless, as `np.str_` and `np.bytes_`
 # are already subclasses of their builtin counterpart
@@ -14,7 +17,7 @@ _UIntLike = Union[_BoolLike, np.unsignedinteger]
 _IntLike = Union[_BoolLike, int, np.integer]
 _FloatLike = Union[_IntLike, float, np.floating]
 _ComplexLike = Union[_FloatLike, complex, np.complexfloating]
-_TD64Like = Union[_IntLike, np.timedelta64]
+_TD64Like = Union[_IntLike, np.timedelta64[_Unit]]
 
 _NumberLike = Union[int, float, complex, np.number, np.bool_]
 _ScalarLike = Union[

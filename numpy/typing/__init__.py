@@ -120,7 +120,7 @@ API
 # NOTE: The API section will be appended with additional entries
 # further down in this file
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Union
 
 if TYPE_CHECKING:
     import sys
@@ -132,7 +132,7 @@ else:
     def final(f): return f
 
 if not TYPE_CHECKING:
-    __all__ = ["ArrayLike", "DTypeLike", "NBitBase"]
+    __all__ = ["ArrayLike", "DTypeLike", "NBitBase", "TimeUnit"]
 else:
     # Ensure that all objects within this module are accessible while
     # static type checking. This includes private ones, as we need them
@@ -185,27 +185,53 @@ class NBitBase:
     """
 
     def __init_subclass__(cls) -> None:
-        allowed_names = {
-            "NBitBase", "_256Bit", "_128Bit", "_96Bit", "_80Bit",
-            "_64Bit", "_32Bit", "_16Bit", "_8Bit",
-        }
-        if cls.__name__ not in allowed_names:
+        if cls is not NBitBase:
             raise TypeError('cannot inherit from final class "NBitBase"')
         super().__init_subclass__()
 
 
-# Silence errors about subclassing a `@final`-decorated class
-class _256Bit(NBitBase): ...  # type: ignore[misc]
-class _128Bit(_256Bit): ...  # type: ignore[misc]
-class _96Bit(_128Bit): ...  # type: ignore[misc]
-class _80Bit(_96Bit): ...  # type: ignore[misc]
-class _64Bit(_80Bit): ...  # type: ignore[misc]
-class _32Bit(_64Bit): ...  # type: ignore[misc]
-class _16Bit(_32Bit): ...  # type: ignore[misc]
-class _8Bit(_16Bit): ...  # type: ignore[misc]
+@final  # Dissallow the creation of arbitrary `TimeUnit` subclasses
+class _TimeUnit:
+    """An object representing `~numpy.timedelta64` and `~numpy.datetime64` units."""
+
+    def __init_subclass__(cls) -> None:
+        if cls is not TimeUnit:
+            raise TypeError('cannot inherit from final class "TimeUnit"')
+        super().__init_subclass__()
+
+
+TimeUnit = Union[_Y, _W]
+
+if TYPE_CHECKING:
+    # Silence errors about subclassing a `@final`-decorated class
+    class _256Bit(NBitBase): ...  # type: ignore[misc]
+    class _128Bit(_256Bit): ...  # type: ignore[misc]
+    class _96Bit(_128Bit): ...  # type: ignore[misc]
+    class _80Bit(_96Bit): ...  # type: ignore[misc]
+    class _64Bit(_80Bit): ...  # type: ignore[misc]
+    class _32Bit(_64Bit): ...  # type: ignore[misc]
+    class _16Bit(_32Bit): ...  # type: ignore[misc]
+    class _8Bit(_16Bit): ...  # type: ignore[misc]
+
+    # Treat the `Y` branch distinct from the `W` branch,
+    # as `Y`/`M` cannot be downcasted into `W`
+    class _Y(_TimeUnit): ...  # type: ignore[misc]
+    class _M(_Y): ...  # type: ignore[misc]
+
+    class _W(_TimeUnit): ...  # type: ignore[misc]
+    class _D(_W): ...  # type: ignore[misc]
+    class _h(_D): ...  # type: ignore[misc]
+    class _m(_h): ...  # type: ignore[misc]
+    class _s(_m): ...  # type: ignore[misc]
+    class _ms(_s): ...  # type: ignore[misc]
+    class _us(_ms): ...  # type: ignore[misc]
+    class _ns(_us): ...  # type: ignore[misc]
+    class _ps(_ns): ...  # type: ignore[misc]
+    class _fs(_ps): ...  # type: ignore[misc]
+    class _as(_fs): ...  # type: ignore[misc]
 
 # Clean up the namespace
-del TYPE_CHECKING, final, List
+del TYPE_CHECKING, final, List, Union
 
 from ._scalars import (
     _CharLike,

@@ -93,4 +93,38 @@ add_newdoc('DTypeLike', 'typing.Union[...]',
 
     """)
 
+add_newdoc('TimeUnit', 'typing.Union[...]',
+    """
+    A `~typing.Union` representing the units of `~numpy.datetime64` and `~numpy.timedelta64`.
+
+    See Also
+    --------
+    TODO
+
+    Examples
+    --------
+    .. code-block:: python
+
+        >>> from typing import TypeVar, TYPE_CHECKING
+        >>> import numpy as np
+        >>> import numpy.typing as npt
+
+        >>> T = TypeVar("T", bound=npt.TimeUnit)
+
+        >>> def add(a: "np.timedelta64[T]", b: "np.timedelta64[T]") -> "np.timedelta64[T]":
+        ...     return a + b
+
+        >>> a = np.timedelta64(1, "D")
+        >>> b = np.timedelta64(1, "s")
+        >>> out = add(a, b)
+
+        >>> if TYPE_CHECKING:
+        ...     reveal_locals()
+        ...     # note: Revealed local types are:
+        ...     # note:     a: numpy.timedelta64[numpy.typing._D]
+        ...     # note:     b: numpy.timedelta64[numpy.typing._s]
+        ...     # note:     out: numpy.timedelta64[numpy.typing._s*]
+
+    """)
+
 _docstrings = _parse_docstrings()

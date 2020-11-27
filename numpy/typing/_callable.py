@@ -40,7 +40,7 @@ from ._scalars import (
     _ComplexLike,
     _NumberLike,
 )
-from . import NBitBase
+from . import NBitBase, TimeUnit
 
 if sys.version_info >= (3, 8):
     from typing import Protocol
@@ -59,6 +59,7 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
 
     _NBit_co = TypeVar("_NBit_co", covariant=True, bound=NBitBase)
     _NBit = TypeVar("_NBit", bound=NBitBase)
+    _Unit = TypeVar("_Unit", bound=TimeUnit)
 
     _IntType = TypeVar("_IntType", bound=integer)
     _FloatType = TypeVar("_FloatType", bound=floating)
@@ -131,11 +132,11 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
         @overload
         def __call__(self, __other: _FloatType) -> _2Tuple[_FloatType]: ...
 
-    class _TD64Div(Protocol[_NumberType_co]):
+    class _TD64Div(Protocol[_Unit, _NumberType_co]):
         @overload
-        def __call__(self, __other: timedelta64) -> _NumberType_co: ...
+        def __call__(self, __other: timedelta64[_Unit]) -> _NumberType_co: ...
         @overload
-        def __call__(self, __other: _FloatLike) -> timedelta64: ...
+        def __call__(self, __other: _FloatLike) -> timedelta64[_Unit]: ...
 
     class _IntTrueDiv(Protocol[_NBit_co]):
         @overload
