@@ -87,6 +87,7 @@ from numpy.typing import (
     _ArrayLikeTD64_co,
     _ArrayLikeDT64_co,
     _ArrayLikeObject_co,
+    _ArrayLikeFlexible_co,
     _DTypeLikeBool,
     _DTypeLikeUInt,
     _DTypeLikeInt,
@@ -95,6 +96,7 @@ from numpy.typing import (
     _DTypeLikeTD64,
     _DTypeLikeDT64,
     _DTypeLikeObject,
+    _DTypeLikeFlexible,
 )
 
 if sys.version_info >= (3, 8):
