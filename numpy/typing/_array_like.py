@@ -19,6 +19,7 @@ from numpy import (
     void,
     str_,
     bytes_,
+    flexible,
 )
 
 from . import _HAS_TYPING_EXTENSIONS
@@ -119,6 +120,10 @@ _ArrayLikeStr_co = _ArrayLike[
 _ArrayLikeBytes_co = _ArrayLike[
     "dtype[bytes_]",
     bytes,
+]
+_ArrayLikeFlexible_co = _ArrayLike[
+    "dtype[flexible]",
+    Union[str, bytes],
 ]
 
 _ArrayLikeInt = _ArrayLike[

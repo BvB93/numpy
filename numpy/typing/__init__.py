@@ -339,6 +339,7 @@ from ._dtype_like import (
     _DTypeLikeVoid,
     _DTypeLikeStr,
     _DTypeLikeBytes,
+    _DTypeLikeFlexible,
     _DTypeLikeComplex_co,
 )
 from ._array_like import (
@@ -360,6 +361,7 @@ from ._array_like import (
     _ArrayLikeVoid_co,
     _ArrayLikeStr_co,
     _ArrayLikeBytes_co,
+    _ArrayLikeFlexible_co,
 )
 from ._generic_alias import (
     NDArray as NDArray,

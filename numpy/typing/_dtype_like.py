@@ -229,6 +229,16 @@ _DTypeLikeObject = Union[
     _ObjectCodes,
 ]
 
+_DTypeLikeFlexible = Union[
+    Type[np.flexible],
+    "np.dtype[np.flexible]",
+    "_SupportsDType[np.dtype[np.flexible]]",
+    _StrCodes,
+    _BytesCodes,
+    _VoidCodes,
+    _VoidDTypeLike,
+]
+
 _DTypeLikeComplex_co = Union[
     _DTypeLikeBool,
     _DTypeLikeUInt,
