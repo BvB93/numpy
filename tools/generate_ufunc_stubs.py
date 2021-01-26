@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """A script for generating `numpy.ufunc` annotations."""
 
+from __future__ import annotations
+
 import sys
 import types
 import hashlib
@@ -218,9 +220,9 @@ DTYPE_MAPPING = {
     1000: "None | _DTypeLikeObject",
 }
 
-INSERT: "Literal[0]" = 0
-REPLACE: "Literal[1]" = 1
-DELETE: "Literal[2]" = 2
+INSERT: Literal[0] = 0
+REPLACE: Literal[1] = 1
+DELETE: Literal[2] = 2
 
 
 class ArgTuple(NamedTuple):
@@ -240,7 +242,7 @@ class CaseTuple(NamedTuple):
     #: * `0`: Insert an element
     #: * `1`: Replace an element
     #: * `2`: Delete an element
-    op: "Literal[0, 1, 2]"
+    op: Literal[0, 1, 2]
 
     #: The index in the `ArgTuple` list where `op` is to-be performed
     idx: int
