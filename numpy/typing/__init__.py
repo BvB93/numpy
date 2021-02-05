@@ -339,6 +339,7 @@ from ._array_like import (
     _ArrayLike2,
     _NestedSequence,
     _RecursiveSequence,
+    _SupportsArrayInterface,
     _SupportsArray,
     _ArrayLikeInt,
     _ArrayLikeBool_co,

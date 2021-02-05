@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Any, overload, Sequence, TYPE_CHECKING, Union, TypeVar
+from typing import Any, overload, Sequence, TYPE_CHECKING, Union, TypeVar, Dict
 
 from numpy import (
     ndarray,
@@ -46,8 +46,14 @@ if TYPE_CHECKING or HAVE_PROTOCOL:
     # any and all remaining overloads
     class _SupportsArray(Protocol[_DType_co]):
         def __array__(self) -> ndarray[Any, _DType_co]: ...
+
+    # TODO: Sort out the `__array_interface__` protocol
+    class _SupportsArrayInterface(Protocol):
+        @property
+        def __array_interface__(self) -> Any: ...
 else:
-    _SupportsArray = Any
+    _SupportsArray = NotImplemented
+    _SupportsArrayInterface = NotImplemented
 
 # TODO: Wait for support for recursive types
 _NestedSequence = Union[
@@ -77,6 +83,7 @@ _ArrayLike1 = _NestedSequence[_SupportsArray[_DType]]
 # https://github.com/python/typing/issues/593
 ArrayLike = Union[
     _RecursiveSequence,
+    _SupportsArrayInterface,
     _ArrayLike2[
         "dtype[Any]",
         Union[bool, int, float, complex, str, bytes]
