@@ -335,7 +335,8 @@ from ._dtype_like import (
 )
 from ._array_like import (
     ArrayLike as ArrayLike,
-    _ArrayLike,
+    _ArrayLike1,
+    _ArrayLike2,
     _NestedSequence,
     _RecursiveSequence,
     _SupportsArray,
