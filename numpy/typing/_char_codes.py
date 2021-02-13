@@ -58,7 +58,7 @@ if TYPE_CHECKING or HAVE_LITERAL:
     _StrCodes = Literal["str", "str_", "str0", "unicode", "unicode_", "U", "=U", "<U", ">U", "|U"]
     _BytesCodes = Literal["bytes", "bytes_", "bytes0", "S", "=S", "<S", ">S", "|S"]
     _VoidCodes = Literal["void", "void0", "V", "=V", "<V", ">V", "|V"]
-    _ObjectCodes = Literal["object", "object_", "O", "=O", "<O", ">O", "|O"]
+    _ObjectCodes = Literal["object", "object_", "object0", "O", "=O", "<O", ">O", "|O"]
 
     _DT64Codes = Literal[
         "datetime64", "=datetime64", "<datetime64", ">datetime64", "|datetime64",
