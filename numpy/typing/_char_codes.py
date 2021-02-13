@@ -13,7 +13,7 @@ else:
         HAVE_LITERAL = True
 
 if TYPE_CHECKING or HAVE_LITERAL:
-    _BoolCodes = Literal["?", "=?", "<?", ">?", "bool", "bool_", "bool8"]
+    _BoolCodes = Literal["bool", "bool_", "bool8", "?", "=?", "<?", ">?"]
 
     _UInt8Codes = Literal["uint8", "u1", "=u1", "<u1", ">u1"]
     _UInt16Codes = Literal["uint16", "u2", "=u2", "<u2", ">u2"]
