@@ -20,6 +20,7 @@ from typing import (
     Iterable,
     TYPE_CHECKING,
     MutableSequence,
+    Sequence,
 )
 
 import numpy as np
@@ -123,22 +124,28 @@ _ScalarOrArray2 = Tuple[
 _ExtObj = List[Union[int, Optional[Callable[[str, int], Any]]]]
 
 _ArrayLikeTD64 = _NestedSequence[_SupportsArray[dtype[timedelta64]]]
+
+_CastingSafe = Literal["no", "equiv", "safe", "same_kind"]
 '''
 
-KWARGS = (
-    "casting: _Casting = ..., "
+KWARGS1: str = (
+    "casting: _CastingSafe = ..., "
     "order: _OrderKACF = ..., "
     "subok: bool = ..., "
     "extobj: _ExtObj = ..., "
-    "where: None | _ArrayLikeBool_co = ..."
+    "where: Optional[_ArrayLikeBool_co] = ..."
+)
+KWARGS2: str = (
+    "order: _OrderKACF = ..., "
+    "subok: bool = ..., "
+    "extobj: _ExtObj = ..., "
+    "where: Optional[_ArrayLikeBool_co] = ..."
 )
 
 UFUNC_TEMPLATE = """
 @type_check_only
 class {name}(ufunc):
 {overloads}
-    @overload
-    def __call__(self, {args}, out: Any = ..., *, signature: str | DTypeLike | Tuple[DTypeLike, ...], dtype: None | str = ..., {kwargs}) -> {out_any}: ...
     @property
     def __name__(self) -> {cls_name}: ...
     @property
@@ -152,13 +159,39 @@ class {name}(ufunc):
     @property
     def identity(self) -> {identity}: ...
     @property
-    def signature(self) -> {signature_attr}: ...
+    def signature(self) -> {signature}: ...
 """
 
 OVERLOAD_TEMPLATE = """
     @overload
-    def __call__(self, {input}, out: {out} = ..., *, dtype: {dtype} = ..., {kwargs}) -> {output}: ...
+    def __call__(self, {input}, out: None = ..., *, dtype: {dtype} = ..., {kwargs}) -> {output}: ...
 """.strip("\n")
+
+OVERLOAD_TEMPLATE_FLEXIBLE = """
+    @overload
+    def __call__(self, {input}, out: None = ..., *, dtype: Any = ..., signature: Any = ..., casting: _Casting = ..., {kwargs}) -> NoReturn: ...
+""".strip("\n")
+
+OVERLOAD_TEMPLATE_RECURSIVE = """
+    @overload
+    def __call__(self, {input}, out: None = ..., *, dtype: Any = ..., signature: Any = ..., casting: _Casting = ..., {kwargs}) -> {output}: ...
+""".strip("\n")
+
+OVERLOAD_TEMPLATE_SIGNATURE = """
+    @overload
+    def __call__(self, {input}, out: None = ..., *, signature: Any, casting: _Casting = ..., {kwargs}) -> {output}: ...
+""".strip("\n")
+
+OVERLOAD_TEMPLATE_OUT = """
+    @overload
+    def __call__(self, {input}, out: {out}, *, dtype: Any = ..., signature: Any = ..., casting: _Casting = ..., {kwargs}) -> {output}: ...
+""".strip("\n")
+
+OVERLOAD_TEMPLATE_UNSAFE = """
+    @overload
+    def __call__(self, {input}, out: None = ..., *, casting: Literal["unsafe"], dtype: Any = ..., signature: Any = ..., {kwargs}) -> {output}: ...
+""".strip("\n")
+
 
 #: A dictionary that maps `numpy.dtype.kind` to one of the
 #: input parameters in `TEMPLATE`
@@ -210,14 +243,14 @@ PRIORITY_MAPPING: Dict[str, int] = {
 
 #: A dictionary mapping a priorities to scalar types
 DTYPE_MAPPING = {
-    0: "None | _DTypeLikeBool",
-    1: "None | _DTypeLikeUInt",
-    2: "None | _DTypeLikeInt",
-    3: "None | _DTypeLikeFloat",
-    4: "None | _DTypeLikeComplex",
-    10: "None | _DTypeLikeTD64",
-    100: "None | _DTypeLikeDT64",
-    1000: "None | _DTypeLikeObject",
+    0: "Optional[_DTypeLikeBool]",
+    1: "Optional[_DTypeLikeUInt]",
+    2: "Optional[_DTypeLikeInt]",
+    3: "Optional[_DTypeLikeFloat]",
+    4: "Optional[_DTypeLikeComplex]",
+    10: "Optional[_DTypeLikeTD64]",
+    100: "Optional[_DTypeLikeDT64]",
+    1000: "Optional[_DTypeLikeObject]",
 }
 
 INSERT: Literal[0] = 0
@@ -265,8 +298,8 @@ def _get_special_cases() -> Dict[np.ufunc, List[CaseTuple]]:
     bool11 = ArgTuple(inp=(b_in,), out=(i_out,), dtype="None")
     bool21 = ArgTuple(inp=(b_in, b_in), out=(i_out,), dtype="None")
     bool22 = ArgTuple(inp=(b_in, b_in), out=(i_out, i_out), dtype="None")
-    bool11_noreturn = ArgTuple(inp=(b_in,), out=("NoReturn",), dtype="None | _DTypeLikeBool")
-    bool21_noreturn = ArgTuple(inp=(b_in, b_in), out=("NoReturn",), dtype="None | _DTypeLikeBool")
+    bool11_noreturn = ArgTuple(inp=(b_in,), out=("NoReturn",), dtype="Optional[_DTypeLikeBool]")
+    bool21_noreturn = ArgTuple(inp=(b_in, b_in), out=("NoReturn",), dtype="Optional[_DTypeLikeBool]")
 
     return {
         # Ufuncs that contain `uu->u`-type signatures but lack `??->i`.
@@ -395,42 +428,76 @@ def _gather_ufuncs(module: types.ModuleType) -> Dict[str, np.ufunc]:
 
 
 def _yield_overloads(
-    type_list: Iterable[ArgTuple], out_type: str
+    type_list: Sequence[ArgTuple], out_type: str
 ) -> Generator[str, None, None]:
     """Yield a set of overloads for specific to every passed `ArgTuple`."""
+    # An overload for removing `np.flexible`-based array-likes
+    _inp = type_list[0][0]
+    yield OVERLOAD_TEMPLATE_FLEXIBLE.format(
+        input=", ".join(f"__x{i}: _ArrayLikeFlexible_co" for i, _ in enumerate(_inp, 1)),
+        kwargs=KWARGS2,
+    )
+
+    # Ufunc-specific overloads
     for _inp, _out, dtype in type_list:
         inp = ", ".join(f"__x{i}: {j}" for i, j in enumerate(_inp, 1))
         out = ", ".join(item for item in _out)
 
         if out == "NoReturn":
             output = out
-            out_array = "None"
         else:
             output = f"{out_type}[{out}]"
-            if len(_out) == 1:
-                out_array = "None | ndarray[Any, Any] | Tuple[ndarray[Any, Any]]"
-            else:
-                out_array = f"None | Tuple[{', '.join('ndarray[Any, Any]' for _ in _out)}]"
 
         yield OVERLOAD_TEMPLATE.format(
-            input=inp, output=output, out=out_array, dtype=dtype, kwargs=KWARGS
+            input=inp, output=output, dtype=dtype, kwargs=KWARGS1
         )
 
+    # An overload for all >4D array-likes
+    yield OVERLOAD_TEMPLATE_RECURSIVE.format(
+        input=", ".join(f"__x{i}: _RecursiveSequence" for i, _ in enumerate(_inp, 1)),
+        output=f"{out_type}[Any]",
+        kwargs=KWARGS2,
+    )
 
-def _construct_cls(ufunc: np.ufunc, types_list: Iterable[ArgTuple], name: str) -> str:
+    # An overload for `casting="unsafe"`
+    yield OVERLOAD_TEMPLATE_UNSAFE.format(
+        input=", ".join(f"__x{i}: Any" for i, _ in enumerate(_inp, 1)),
+        output=f"{out_type}[Any]",
+        kwargs=KWARGS2,
+    )
+
+    # An overload for the `signature` parameter
+    yield OVERLOAD_TEMPLATE_SIGNATURE.format(
+        input=", ".join(f"__x{i}: Any" for i, _ in enumerate(_inp, 1)),
+        output=f"{out_type}[Any]",
+        kwargs=KWARGS2,
+    )
+
+    # An overload for the `out` parameter
+    if len(_out) == 1:
+        out = "Union[_ArrayType, Tuple[_ArrayType]]"
+        output = "_ArrayType"
+    else:
+        out = output = "Tuple[_ArrayType, _ArrayType]"
+    yield OVERLOAD_TEMPLATE_OUT.format(
+        input=", ".join(f"__x{i}: Any" for i, _ in enumerate(_inp, 1)),
+        out=out,
+        output=output,
+        kwargs=KWARGS2,
+    )
+
+
+def _construct_cls(ufunc: np.ufunc, types_list: Sequence[ArgTuple], name: str) -> str:
     """Create the main `~numpy.ufunc` subclass and its ``__call__`` method."""
     nout = range(ufunc.nout)
     if ufunc.nout == 1:
         out_type = "_ScalarOrArray1"
-        out_any = f"{out_type}[Any]"
     elif ufunc.nout == 2:
         out_type = f"_ScalarOrArray2"
-        out_any = f"{out_type}[{', '.join('Any' for _ in nout)}]"
     else:
         raise NotImplementedError(f"{ufunc.__name__}.nout > 2")
 
-    signature = f"_Signature{ufunc.nargs}"
-    signature_attr = f"Literal[{ufunc.signature!r}]" if ufunc.signature is not None else "None"
+    signature = f"Literal[{ufunc.signature!r}]" if ufunc.signature is not None else "None"
 
     if ufunc.identity is None:
         identity = "None"
@@ -439,22 +506,17 @@ def _construct_cls(ufunc: np.ufunc, types_list: Iterable[ArgTuple], name: str) -
     else:
         identity = type(ufunc.identity).__name__
 
-    args = ", ".join(f"__x{i}: ArrayLike" for i in range(1, 1 + ufunc.nin))
     overloads = _yield_overloads(types_list, out_type)
     return UFUNC_TEMPLATE.format(
         overloads="\n".join(i for i in overloads),
         name=name,
-        args=args,
-        out_any=out_any,
-        signature=signature,
-        kwargs=KWARGS,
         cls_name=f"Literal[{ufunc.__name__!r}]",
         nin=f"Literal[{ufunc.nin}]",
         nout=f"Literal[{ufunc.nout}]",
         nargs=f"Literal[{ufunc.nargs}]",
         ntypes=f"Literal[{ufunc.ntypes}]",
         identity=identity,
-        signature_attr=signature_attr,
+        signature=signature,
     )
 
 # TODO: Generate stubs for all other `ufunc` methods
