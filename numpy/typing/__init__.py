@@ -366,6 +366,20 @@ from ._generic_alias import (
     _DType,
     _GenericAlias,
 )
+from ._dtype_protocols import (
+    _SupportsHasObject,
+    _SupportsIsBuiltin,
+    _SupportsIsAlignedStruct,
+    _SupportsItemSize,
+    _SupportsKind,
+    _SupportsName,
+    _SupportsNames,
+    _SupportsFields,
+    _SupportsDescr,
+    _SupportsShape,
+    _SupportsNDim,
+    _SupportsSubDType,
+)
 
 if TYPE_CHECKING:
     from ._ufunc import (
