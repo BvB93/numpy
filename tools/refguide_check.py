@@ -82,6 +82,7 @@ PUBLIC_SUBMODULES = [
     'matrixlib',
     'random',
     'testing',
+    'typing',
 ]
 
 # Docs for these modules are included in the parent module
