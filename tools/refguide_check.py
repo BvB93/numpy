@@ -26,6 +26,8 @@ or in RST-based documentations::
     $ python tools/refguide_check.py --rst doc/source
 
 """
+from __future__ import annotations
+
 import copy
 import doctest
 import inspect
@@ -67,6 +69,10 @@ else:
     directives._directives.pop('codeauthor', None)
     directives._directives.pop('toctree', None)
 
+# Explicitly pass the `from __future__ import annotations` compiler flag
+# to `DocTestRunner.run`; otherwise aforementioned statmenet won't be properly
+# recognized in the to-be tested docstrings
+COMPILE_FLAGS = annotations.compiler_flag
 
 BASE_MODULE = "numpy"
 
@@ -831,7 +837,10 @@ def _run_doctests(tests, full_name, verbose, doctest_warnings):
             # Process our options
             if any([SKIPBLOCK in ex.options for ex in t.examples]):
                 continue
-            fails, successes = runner.run(t, out=output.write, clear_globs=False)
+            fails, successes = runner.run(
+                t, out=output.write, clear_globs=False, compileflags=COMPILE_FLAGS
+            )
+
             if fails > 0:
                 success = False
             ns = t.globs
