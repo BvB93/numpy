@@ -57,8 +57,10 @@ SKIPBLOCK = doctest.register_optionflag('SKIPBLOCK')
 if parse_version(sphinx.__version__) >= parse_version('1.5'):
     # Enable specific Sphinx directives
     from sphinx.directives.other import SeeAlso, Only
+    from sphinx.ext.autodoc.directive import AutodocDirective
     directives.register_directive('seealso', SeeAlso)
     directives.register_directive('only', Only)
+    directives.register_directive('autoclass', AutodocDirective)
 else:
     # Remove sphinx directives that don't run without Sphinx environment.
     # Sphinx < 1.5 installs all directives on import...
