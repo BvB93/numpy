@@ -1240,94 +1240,12 @@ class _ArrayOrScalarCommon:
     def __setstate__(self, __state): ...
     # a `bool_` is returned when `keepdims=True` and `self` is a 0d array
 
-    @overload
-    def all(
-        self,
-        axis: None = ...,
-        out: None = ...,
-        keepdims: L[False] = ...,
-    ) -> bool_: ...
-    @overload
-    def all(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: None = ...,
-        keepdims: bool = ...,
-    ) -> Any: ...
-    @overload
-    def all(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: _NdArraySubClass = ...,
-        keepdims: bool = ...,
-    ) -> _NdArraySubClass: ...
-
-    @overload
-    def any(
-        self,
-        axis: None = ...,
-        out: None = ...,
-        keepdims: L[False] = ...,
-    ) -> bool_: ...
-    @overload
-    def any(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: None = ...,
-        keepdims: bool = ...,
-    ) -> Any: ...
-    @overload
-    def any(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: _NdArraySubClass = ...,
-        keepdims: bool = ...,
-    ) -> _NdArraySubClass: ...
-
-    @overload
-    def argmax(
-        self,
-        axis: None = ...,
-        out: None = ...,
-    ) -> intp: ...
-    @overload
-    def argmax(
-        self,
-        axis: _ShapeLike = ...,
-        out: None = ...,
-    ) -> Any: ...
-    @overload
-    def argmax(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: _NdArraySubClass = ...,
-    ) -> _NdArraySubClass: ...
-
-    @overload
-    def argmin(
-        self,
-        axis: None = ...,
-        out: None = ...,
-    ) -> intp: ...
-    @overload
-    def argmin(
-        self,
-        axis: _ShapeLike = ...,
-         out: None = ...,
-    ) -> Any: ...
-    @overload
-    def argmin(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: _NdArraySubClass = ...,
-    ) -> _NdArraySubClass: ...
-
     def argsort(
         self,
         axis: Optional[SupportsIndex] = ...,
         kind: Optional[_SortKind] = ...,
         order: Union[None, str, Sequence[str]] = ...,
-    ) -> ndarray: ...
+    ) -> NDArray[intp]: ...
 
     @overload
     def choose(
@@ -1389,40 +1307,6 @@ class _ArrayOrScalarCommon:
         self,
         a: ArrayLike,
         axis: Optional[SupportsIndex] = ...,
-        out: _NdArraySubClass = ...,
-    ) -> _NdArraySubClass: ...
-
-    def conj(self: _ArraySelf) -> _ArraySelf: ...
-
-    def conjugate(self: _ArraySelf) -> _ArraySelf: ...
-
-    @overload
-    def cumprod(
-        self,
-        axis: Optional[SupportsIndex] = ...,
-        dtype: DTypeLike = ...,
-        out: None = ...,
-    ) -> ndarray: ...
-    @overload
-    def cumprod(
-        self,
-        axis: Optional[SupportsIndex] = ...,
-        dtype: DTypeLike = ...,
-        out: _NdArraySubClass = ...,
-    ) -> _NdArraySubClass: ...
-
-    @overload
-    def cumsum(
-        self,
-        axis: Optional[SupportsIndex] = ...,
-        dtype: DTypeLike = ...,
-        out: None = ...,
-    ) -> ndarray: ...
-    @overload
-    def cumsum(
-        self,
-        axis: Optional[SupportsIndex] = ...,
-        dtype: DTypeLike = ...,
         out: _NdArraySubClass = ...,
     ) -> _NdArraySubClass: ...
 
@@ -1602,6 +1486,8 @@ _FlexDType = TypeVar("_FlexDType", bound=dtype[flexible])
 # have proper shape support
 _ShapeType = TypeVar("_ShapeType", bound=Any)
 _NumberType = TypeVar("_NumberType", bound=number[Any])
+_InexactType = TypeVar("_InexactType", bound=inexact[Any])
+_SCT_buifcO = TypeVar("_SCT_buifcO", bound=Union[bool_, number[Any], object_])
 
 # There is currently no exhaustive way to type the buffer protocol,
 # as it is implemented exclusivelly in the C API (python/typing#593)
@@ -1719,7 +1605,7 @@ class ndarray(_ArrayOrScalarCommon, Generic[_ShapeType, _DType_co]):
 
     def squeeze(
         self,
-        axis: Union[SupportsIndex, Tuple[SupportsIndex, ...]] = ...,
+        axis: None | SupportsIndex | Tuple[SupportsIndex, ...] = ...,
     ) -> ndarray[Any, _DType_co]: ...
 
     def swapaxes(
@@ -1921,6 +1807,191 @@ class ndarray(_ArrayOrScalarCommon, Generic[_ShapeType, _DType_co]):
         dtype: DTypeLike,
         offset: SupportsIndex = ...
     ) -> NDArray[Any]: ...
+
+    @overload
+    def all(  # type: ignore[misc]
+        self: NDArray[bool_ | number[Any]],
+        axis: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> bool_: ...
+    @overload
+    def all(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | _ShapeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> Any: ...
+    @overload
+    def all(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | _ShapeLike = ...,
+        out: _NdArraySubClass = ...,
+        keepdims: bool = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def any(  # type: ignore[misc]
+        self: NDArray[bool_ | number[Any]],
+        axis: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> bool_: ...
+    @overload
+    def any(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | _ShapeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> Any: ...
+    @overload
+    def any(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | _ShapeLike = ...,
+        out: _NdArraySubClass = ...,
+        keepdims: bool = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def argmax(
+        self,
+        axis: None = ...,
+        out: None = ...,
+    ) -> intp: ...
+    @overload
+    def argmax(
+        self,
+        axis: SupportsIndex,
+        out: None = ...,
+    ) -> Any: ...
+    @overload
+    def argmax(
+        self,
+        axis: None | SupportsIndex = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def argmin(
+        self,
+        axis: None = ...,
+        out: None = ...,
+    ) -> intp: ...
+    @overload
+    def argmin(
+        self,
+        axis: SupportsIndex,
+        out: None = ...,
+    ) -> Any: ...
+    @overload
+    def argmin(
+        self,
+        axis: None | SupportsIndex = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    def conj(self: NDArray[_SCT_buifcO]) -> ndarray[_ShapeType, dtype[_SCT_buifcO]]: ...
+    def conjugate(self: NDArray[_SCT_buifcO]) -> ndarray[_ShapeType, dtype[_SCT_buifcO]]: ...
+
+    @overload
+    def cumprod(
+        self: NDArray[bool_],
+        axis: None | SupportsIndex = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[int_]]: ...
+    @overload
+    def cumprod(
+        self: NDArray[integer[_NBit1]],
+        axis: None | SupportsIndex = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[signedinteger[_NBit1 | _NBitInt]]]: ...
+    @overload
+    def cumprod(
+        self: NDArray[_InexactType],
+        axis: None | SupportsIndex = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[_InexactType]]: ...
+    @overload
+    def cumprod(
+        self: NDArray[object_],
+        axis: None | SupportsIndex = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[object_]]: ...
+    @overload
+    def cumprod(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | SupportsIndex = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[_ScalarType]]: ...
+    @overload
+    def cumprod(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | SupportsIndex = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[Any]]: ...
+    @overload
+    def cumprod(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | SupportsIndex = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def cumsum(
+        self: NDArray[bool_],
+        axis: None | SupportsIndex = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[int_]]: ...
+    @overload
+    def cumsum(
+        self: NDArray[integer[_NBit1]],
+        axis: None | SupportsIndex = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[signedinteger[_NBit1 | _NBitInt]]]: ...
+    @overload
+    def cumsum(
+        self: NDArray[_InexactType],
+        axis: None | SupportsIndex = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[_InexactType]]: ...
+    @overload
+    def cumsum(
+        self: NDArray[object_],
+        axis: None | SupportsIndex = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[object_]]: ...
+    @overload
+    def cumsum(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | SupportsIndex = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[_ScalarType]]: ...
+    @overload
+    def cumsum(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | SupportsIndex = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> ndarray[_ShapeType, dtype[Any]]: ...
+    @overload
+    def cumsum(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | SupportsIndex = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
 
     # Dispatch to the underlying `generic` via protocols
     def __int__(
@@ -2999,9 +3070,43 @@ class generic(_ArrayOrScalarCommon):
     ) -> ndarray[Any, dtype[_ScalarType]]: ...
 
     def squeeze(
-        self: _ScalarType, axis: Union[L[0], Tuple[()]] = ...
+        self: _ScalarType,
+        axis: None | L[0] | Tuple[()] = ...,
     ) -> _ScalarType: ...
-    def transpose(self: _ScalarType, __axes: Tuple[()] = ...) -> _ScalarType: ...
+
+    def transpose(
+        self: _ScalarType,
+        __axes: Tuple[()] = ...,
+    ) -> _ScalarType: ...
+
+    # NOTE: The `out` parameter is, if provided, automatically converted
+    # into a scalar via a 0D-scalar cast
+    @overload
+    def argmax(  # type: ignore[misc]
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+    ) -> intp: ...
+    @overload
+    def argmax(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def argmin(  # type: ignore[misc]
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+    ) -> intp: ...
+    @overload
+    def argmin(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+    ) -> _ScalarType: ...
+
     # Keep `dtype` at the bottom to avoid name conflicts with `np.dtype`
     @property
     def dtype(self: _ScalarType) -> dtype[_ScalarType]: ...
@@ -3034,6 +3139,69 @@ class number(generic, Generic[_NBit1]):  # type: ignore
     __le__: _ComparisonOp[_NumberLike_co, _ArrayLikeNumber_co]
     __gt__: _ComparisonOp[_NumberLike_co, _ArrayLikeNumber_co]
     __ge__: _ComparisonOp[_NumberLike_co, _ArrayLikeNumber_co]
+
+    @overload
+    def all(  # type: ignore[misc]
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> bool_: ...
+    @overload
+    def all(
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def any(  # type: ignore[misc]
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> bool_: ...
+    @overload
+    def any(
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
+    def conj(self: _NumberType) -> _NumberType: ...
+    def conjugate(self: _NumberType) -> _NumberType: ...
+
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
 
 class bool_(generic):
     def __init__(self, __value: object = ...) -> None: ...
@@ -3082,6 +3250,97 @@ class bool_(generic):
     __gt__: _ComparisonOp[_NumberLike_co, _ArrayLikeNumber_co]
     __ge__: _ComparisonOp[_NumberLike_co, _ArrayLikeNumber_co]
 
+    @overload
+    def all(  # type: ignore[misc]
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> bool_: ...
+    @overload
+    def all(
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def any(  # type: ignore[misc]
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> bool_: ...
+    @overload
+    def any(
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
+    def conj(self) -> bool_: ...
+    def conjugate(self) -> bool_: ...
+
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> NDArray[int_]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> NDArray[_ScalarType]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> NDArray[int_]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
 bool8 = bool_
 
 class object_(generic):
@@ -3095,6 +3354,97 @@ class object_(generic):
     def __int__(self) -> int: ...
     def __float__(self) -> float: ...
     def __complex__(self) -> complex: ...
+
+    @overload
+    def all(
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> Any: ...
+    @overload
+    def all(
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def any(
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> Any: ...
+    @overload
+    def any(
+        self,
+        axis: None | L[0] | Tuple[()] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
+    def conj(self) -> Any: ...
+    def conjugate(self) -> Any: ...
+
+    @overload
+    def cumprod(  # type: ignore[misc]
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> NDArray[object_]: ...
+    @overload
+    def cumprod(  # type: ignore[misc]
+        self,
+        axis: None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> NDArray[_ScalarType]: ...
+    @overload
+    def cumprod(  # type: ignore[misc]
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def cumsum(  # type: ignore[misc]
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> NDArray[object_]: ...
+    @overload
+    def cumsum(  # type: ignore[misc]
+        self,
+        axis: None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> NDArray[_ScalarType]: ...
+    @overload
+    def cumsum(  # type: ignore[misc]
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
 
 object0 = object_
 
@@ -3192,6 +3542,57 @@ class integer(number[_NBit1]):  # type: ignore
     def __ror__(self, other: _IntLike_co) -> integer: ...
     def __xor__(self, other: _IntLike_co) -> integer: ...
     def __rxor__(self, other: _IntLike_co) -> integer: ...
+
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> NDArray[signedinteger[_NBit1 | _NBitInt]]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> NDArray[_ScalarType]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> NDArray[signedinteger[_NBit1 | _NBitInt]]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
 
 class signedinteger(integer[_NBit1]):
     def __init__(self, __value: _IntValue = ...) -> None: ...
@@ -3316,6 +3717,64 @@ ulonglong = unsignedinteger[_NBitLongLong]
 
 class inexact(number[_NBit1]):  # type: ignore
     def __getnewargs__(self: inexact[_64Bit]) -> Tuple[float, ...]: ...
+
+    @overload
+    def cumprod(
+        self: _InexactType,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> NDArray[_InexactType]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> NDArray[_ScalarType]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumprod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def cumsum(
+        self: _InexactType,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+    ) -> NDArray[_InexactType]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+    ) -> NDArray[_ScalarType]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+    ) -> NDArray[Any]: ...
+    @overload
+    def cumsum(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
 
 _IntType = TypeVar("_IntType", bound=integer)
 _FloatType = TypeVar('_FloatType', bound=floating)
