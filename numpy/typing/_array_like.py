@@ -23,6 +23,7 @@ from numpy import (
 
 from . import _HAS_TYPING_EXTENSIONS
 from ._dtype_like import DTypeLike
+from ._generic_alias import _GenericAlias, _DType as DType
 
 if sys.version_info >= (3, 8):
     from typing import Protocol
@@ -31,8 +32,8 @@ elif _HAS_TYPING_EXTENSIONS:
 
 _T = TypeVar("_T")
 _ScalarType = TypeVar("_ScalarType", bound=generic)
-_DType = TypeVar("_DType", bound="dtype[Any]")
-_DType_co = TypeVar("_DType_co", covariant=True, bound="dtype[Any]")
+_DType = TypeVar("_DType", bound=DType[Any])
+_DType_co = TypeVar("_DType_co", covariant=True, bound=DType[Any])
 
 if TYPE_CHECKING or _HAS_TYPING_EXTENSIONS:
     # The `_SupportsArray` protocol only cares about the default dtype
@@ -43,7 +44,8 @@ if TYPE_CHECKING or _HAS_TYPING_EXTENSIONS:
     class _SupportsArray(Protocol[_DType_co]):
         def __array__(self) -> ndarray[Any, _DType_co]: ...
 else:
-    _SupportsArray = Any
+    class _SupportsArray: ...
+    _SupportsArray = GenericAlias(_SupportsArray, _DType_co)
 
 # TODO: Wait for support for recursive types
 _NestedSequence = Union[
