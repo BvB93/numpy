@@ -55,13 +55,8 @@ _NestedSequence = Union[
 ]
 _RecursiveSequence = Sequence[Sequence[Sequence[Sequence[Sequence[Any]]]]]
 
-# A union representing array-like objects; consists of two typevars:
-# One representing types that can be parametrized w.r.t. `np.dtype`
-# and another one for the rest
-_ArrayLike = Union[
-    _NestedSequence[_SupportsArray[_DType]],
-    _NestedSequence[_T],
-]
+# A subset of `npt.ArrayLike` that can be parametrized w.r.t. `np.generic`
+_ArrayLike = _NestedSequence[_SupportsArray[dtype[_ScalarType]]]
 
 # TODO: support buffer protocols once
 #
@@ -72,56 +67,55 @@ _ArrayLike = Union[
 # https://github.com/python/typing/issues/593
 ArrayLike = Union[
     _RecursiveSequence,
-    _ArrayLike[
-        "dtype[Any]",
-        Union[bool, int, float, complex, str, bytes]
-    ],
+    _ArrayLike[Any],
+    _NestedSequence[Union[complex, str, bytes]],
 ]
+
+# NOTE: As a reminder: `complex` is a supertype of `float`,
+# which is a supertype of `int`, which is a superclass of `bool`
 
 # `ArrayLike<X>_co`: array-like objects that can be coerced into `X`
 # given the casting rules `same_kind`
-_ArrayLikeBool_co = _ArrayLike[
-    "dtype[bool_]",
-    bool,
+_ArrayLikeBool_co = Union[
+    _ArrayLike[bool_],
+    _NestedSequence[bool],
 ]
-_ArrayLikeUInt_co = _ArrayLike[
-    "dtype[Union[bool_, unsignedinteger[Any]]]",
-    bool,
+_ArrayLikeUInt_co = Union[
+    _ArrayLike[Union[bool_, unsignedinteger]],
+    _NestedSequence[bool],
 ]
-_ArrayLikeInt_co = _ArrayLike[
-    "dtype[Union[bool_, integer[Any]]]",
-    Union[bool, int],
+_ArrayLikeInt_co = Union[
+    _ArrayLike[Union[bool_, integer]],
+    _NestedSequence[int],
 ]
-_ArrayLikeFloat_co = _ArrayLike[
-    "dtype[Union[bool_, integer[Any], floating[Any]]]",
-    Union[bool, int, float],
+_ArrayLikeFloat_co = Union[
+    _ArrayLike[Union[bool_, integer, floating]],
+    _NestedSequence[float],
 ]
-_ArrayLikeComplex_co = _ArrayLike[
-    "dtype[Union[bool_, integer[Any], floating[Any], complexfloating[Any, Any]]]",
-    Union[bool, int, float, complex],
+_ArrayLikeComplex_co = Union[
+    _ArrayLike[Union[bool_, integer, floating, complexfloating]],
+    _NestedSequence[complex],
 ]
-_ArrayLikeNumber_co = _ArrayLike[
-    "dtype[Union[bool_, number[Any]]]",
-    Union[bool, int, float, complex],
+_ArrayLikeNumber_co = Union[
+    _ArrayLike[Union[bool_, integer, floating, complexfloating]],
+    _NestedSequence[complex],
 ]
-_ArrayLikeTD64_co = _ArrayLike[
-    "dtype[Union[bool_, integer[Any], timedelta64]]",
-    Union[bool, int],
+_ArrayLikeTD64_co = Union[
+    _ArrayLike[Union[bool_, integer, timedelta64()]],
+    _NestedSequence[int],
 ]
-_ArrayLikeDT64_co = _NestedSequence[_SupportsArray["dtype[datetime64]"]]
-_ArrayLikeObject_co = _NestedSequence[_SupportsArray["dtype[object_]"]]
-
-_ArrayLikeVoid_co = _NestedSequence[_SupportsArray["dtype[void]"]]
-_ArrayLikeStr_co = _ArrayLike[
-    "dtype[str_]",
-    str,
+_ArrayLikeDT64_co = _ArrayLike[datetime64]
+_ArrayLikeObject_co = _ArrayLike[object_]
+_ArrayLikeVoid_co = _ArrayLike[void]
+_ArrayLikeStr_co = Union[
+    _ArrayLike[str_],
+    _NestedSequence[str],
 ]
 _ArrayLikeBytes_co = _ArrayLike[
-    "dtype[bytes_]",
-    bytes,
+    _ArrayLike[byte_],
+    _NestedSequence[bytes],
 ]
-
 _ArrayLikeInt = _ArrayLike[
-    "dtype[integer[Any]]",
-    int,
+    _ArrayLike[integer],
+    _NestedSequence[int],
 ]
