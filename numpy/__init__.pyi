@@ -1320,114 +1320,11 @@ class _ArrayOrScalarCommon:
         out: _NdArraySubClass = ...,
     ) -> _NdArraySubClass: ...
 
-    @overload
-    def max(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: None = ...,
-        keepdims: bool = ...,
-        initial: _NumberLike_co = ...,
-        where: _ArrayLikeBool_co = ...,
-    ) -> Any: ...
-    @overload
-    def max(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: _NdArraySubClass = ...,
-        keepdims: bool = ...,
-        initial: _NumberLike_co = ...,
-        where: _ArrayLikeBool_co = ...,
-    ) -> _NdArraySubClass: ...
-
-    @overload
-    def mean(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        dtype: DTypeLike = ...,
-        out: None = ...,
-        keepdims: bool = ...,
-    ) -> Any: ...
-    @overload
-    def mean(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        dtype: DTypeLike = ...,
-        out: _NdArraySubClass = ...,
-        keepdims: bool = ...,
-    ) -> _NdArraySubClass: ...
-
-    @overload
-    def min(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: None = ...,
-        keepdims: bool = ...,
-        initial: _NumberLike_co = ...,
-        where: _ArrayLikeBool_co = ...,
-    ) -> Any: ...
-    @overload
-    def min(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: _NdArraySubClass = ...,
-        keepdims: bool = ...,
-        initial: _NumberLike_co = ...,
-        where: _ArrayLikeBool_co = ...,
-    ) -> _NdArraySubClass: ...
-
     def newbyteorder(
         self: _ArraySelf,
         __new_order: _ByteOrder = ...,
     ) -> _ArraySelf: ...
 
-    @overload
-    def prod(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        dtype: DTypeLike = ...,
-        out: None = ...,
-        keepdims: bool = ...,
-        initial: _NumberLike_co = ...,
-        where: _ArrayLikeBool_co = ...,
-    ) -> Any: ...
-    @overload
-    def prod(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        dtype: DTypeLike = ...,
-        out: _NdArraySubClass = ...,
-        keepdims: bool = ...,
-        initial: _NumberLike_co = ...,
-        where: _ArrayLikeBool_co = ...,
-    ) -> _NdArraySubClass: ...
-
-    @overload
-    def ptp(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: None = ...,
-        keepdims: bool = ...,
-    ) -> Any: ...
-    @overload
-    def ptp(
-        self,
-        axis: Optional[_ShapeLike] = ...,
-        out: _NdArraySubClass = ...,
-        keepdims: bool = ...,
-    ) -> _NdArraySubClass: ...
-
-    @overload
-    def round(
-        self: _ArraySelf,
-        decimals: SupportsIndex = ...,
-        out: None = ...,
-    ) -> _ArraySelf: ...
-    @overload
-    def round(
-        self,
-        decimals: SupportsIndex = ...,
-        out: _NdArraySubClass = ...,
-    ) -> _NdArraySubClass: ...
 
     @overload
     def std(
@@ -1496,7 +1393,20 @@ _DType_co = TypeVar("_DType_co", covariant=True, bound=dtype[Any])
 _ShapeType = TypeVar("_ShapeType", bound=Any)
 _NumberType = TypeVar("_NumberType", bound=number[Any])
 _InexactType = TypeVar("_InexactType", bound=inexact[Any])
+
 _SCT_buifcO = TypeVar("_SCT_buifcO", bound=Union[bool_, number[Any], object_])
+_SCT_fcm = TypeVar("_SCT_fcm", bound=Union[inexact[Any], timedelta64])
+_SCT_buifcmM = TypeVar("_SCT_buifcmM", bound=Union[
+    bool_,
+    number[Any],
+    timedelta64,
+    datetime64,
+])
+_SCT_uifcmM = TypeVar("_SCT_uifcmM", bound=Union[
+    number[Any],
+    timedelta64,
+    datetime64,
+])
 
 _BufferType = Union[ndarray, bytes, bytearray, memoryview]
 
@@ -1976,6 +1886,266 @@ class ndarray(_ArrayOrScalarCommon, Generic[_ShapeType, _DType_co]):
         self: NDArray[bool_ | number[Any] | object_],
         axis: None | SupportsIndex = ...,
         dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def max(
+        self: NDArray[_SCT_buifcmM],
+        axis: None = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> _SCT_buifcmM: ...
+    @overload
+    def max(
+        self: NDArray[object_],
+        axis: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> Any: ...
+    @overload
+    def max(
+        self: NDArray[bool_ | number[Any] | timdelta64 | datetime64 | object_],
+        axis: None | _ShapeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> Any: ...
+    @overload
+    def max(
+        self: NDArray[bool_ | number[Any] | timdelta64 | datetime64 | object_],
+        axis: None | _ShapeLike = ...,
+        out: _NdArraySubClass = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def mean(
+        self: NDarray[bool | integer[Any]],
+        axis: None = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> float64: ...
+    @overload
+    def mean(
+        self: NDarray[_SCT_fcm],
+        axis: None = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> _SCT_fcm: ...
+    @overload
+    def mean(
+        self: NDarray[object_],
+        axis: None = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> Any: ...
+    @overload
+    def mean(
+        self: NDarray[bool_ | number[Any] | timedelta64 | object_],
+        axis: None = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def mean(
+        self: NDarray[bool_ | number[Any] | timedelta64 | object_],
+        axis: None = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> Any: ...
+    @overload
+    def mean(
+        self: NDarray[bool_ | number[Any] | timedelta64 | object_],
+        axis: None | _ShapeLike = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> Any: ...
+    @overload
+    def mean(
+        self: NDarray[bool_ | number[Any] | timedelta64 | object_],
+        axis: None | _ShapeLike = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+        keepdims: bool = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def min(
+        self: NDArray[_SCT_buifcmM],
+        axis: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> _SCT_buifcmM: ...
+    @overload
+    def min(
+        self: NDArray[object_],
+        axis: None = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> Any: ...
+    @overload
+    def min(
+        self: NDArray[bool_ | number[Any] | timdelta64 | datetime64 | object_],
+        axis: None | _ShapeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> Any: ...
+    @overload
+    def min(
+        self: NDArray[bool_ | number[Any] | timdelta64 | datetime64 | object_],
+        axis: None | _ShapeLike = ...,
+        out: _NdArraySubClass = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def prod(
+        self: NDArray[bool_ | signedinteger[Any]],
+        axis: None = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> int64: ...
+    @overload
+    def prod(
+        self: NDArray[unsignedinteger[Any]],
+        axis: None = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> uint64: ...
+    @overload
+    def prod(
+        self: NDArray[_InexactType],
+        axis: None = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> _InexactType: ...
+    @overload
+    def prod(
+        self: NDArray[object_],
+        axis: None = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def prod(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | _ShapeLike = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self: NDArray[bool_ | number[Any] | object_],
+        axis: None | _ShapeLike = ...,
+        dtype: DTypeLike = ...,
+        out: _NdArraySubClass = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _ArrayLikeBool_co = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def ptp(
+        self: NDArray[_SCT_uifcmM],
+        axis: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> _SCT_uifcmM: ...
+    @overload
+    def ptp(
+        self: NDArray[object_],
+        axis: None = ...,
+        out: None = ...,
+        keepdims: L[False] = ...,
+    ) -> Any: ...
+    @overload
+    def ptp(
+        self: NDArray[number[Any] | timedelta64 | datetime64 | object_],
+        axis: None | _ShapeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> Any: ...
+    @overload
+    def ptp(
+        self: NDArray[number[Any] | timedelta64 | datetime64 | object_],
+        axis: None | _ShapeLike = ...,
+        out: _NdArraySubClass = ...,
+        keepdims: bool = ...,
+    ) -> _NdArraySubClass: ...
+
+    @overload
+    def round(
+        self: NDArray[bool_],
+        decimals: SupportsIndex = ...,
+        out: None = ...,
+    ) -> NDArray[float16]: ...
+    @overload
+    def round(
+        self: NDArray[_NumberType],
+        decimals: SupportsIndex = ...,
+        out: None = ...,
+    ) -> NDArray[_NumberType]: ...
+    @overload
+    def round(
+        self: NDArray[bool_ | number[Any]],
+        decimals: SupportsIndex = ...,
         out: _NdArraySubClass = ...,
     ) -> _NdArraySubClass: ...
 
@@ -3193,6 +3363,113 @@ class number(generic, Generic[_NBit1]):  # type: ignore
         out: _NdArraySubClass = ...,
     ) -> _NdArraySubClass: ...
 
+    @overload
+    def max(
+        self: _ScalarType,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def max(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def min(
+        self: _ScalarType,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def min(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> number[Any]: ...
+    @overload
+    def prod(
+        self,
+        axis:None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def ptp(
+        self: _ScalarType,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def ptp(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def round(
+        self: _ScalarType,
+        decimals: SupportsIndex = ...,
+        out: None = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def round(
+        self,
+        decimals: SupportsIndex = ...,
+        out: NDArray[_ScalarType] = ...,
+    ) -> _ScalarType: ...
+
 class bool_(generic):
     def __init__(self, __value: object = ...) -> None: ...
     def item(
@@ -3331,6 +3608,98 @@ class bool_(generic):
         out: _NdArraySubClass = ...,
     ) -> _NdArraySubClass: ...
 
+    @overload
+    def max(
+        self: _ScalarType,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def max(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def min(
+        self: _ScalarType,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def min(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> int64: ...
+    @overload
+    def prod(
+        self,
+        axis:None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def round(
+        self,
+        decimals: SupportsIndex = ...,
+        out: None = ...,
+    ) -> float16: ...
+    @overload
+    def round(
+        self,
+        decimals: SupportsIndex = ...,
+        out: NDArray[_ScalarType] = ...,
+    ) -> _ScalarType: ...
+
 bool8 = bool_
 
 class object_(generic):
@@ -3436,6 +3805,100 @@ class object_(generic):
         out: _NdArraySubClass = ...,
     ) -> _NdArraySubClass: ...
 
+    @overload
+    def max(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def max(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def min(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def min(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self,
+        axis:None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def ptp(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> Any: ...
+    @overload
+    def ptp(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
 object0 = object_
 
 # The `datetime64` constructors requires an object with the three attributes below,
@@ -3474,6 +3937,59 @@ class datetime64(generic):
     __le__: _ComparisonOp[datetime64, _ArrayLikeDT64_co]
     __gt__: _ComparisonOp[datetime64, _ArrayLikeDT64_co]
     __ge__: _ComparisonOp[datetime64, _ArrayLikeDT64_co]
+
+    @overload
+    def max(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> datetime64: ...
+    @overload
+    def max(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def min(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> datetime64: ...
+    @overload
+    def min(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def ptp(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> timedelta64: ...
+    @overload
+    def ptp(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
 
 # Support for `__index__` was added in python 3.8 (bpo-20092)
 if sys.version_info >= (3, 8):
@@ -3589,6 +4105,47 @@ class signedinteger(integer[_NBit1]):
     __divmod__: _SignedIntDivMod[_NBit1]
     __rdivmod__: _SignedIntDivMod[_NBit1]
 
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> int64: ...
+    @overload
+    def prod(
+        self,
+        axis:None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
 int8 = signedinteger[_8Bit]
 int16 = signedinteger[_16Bit]
 int32 = signedinteger[_32Bit]
@@ -3638,6 +4195,59 @@ class timedelta64(generic):
     __gt__: _ComparisonOp[_TD64Like_co, _ArrayLikeTD64_co]
     __ge__: _ComparisonOp[_TD64Like_co, _ArrayLikeTD64_co]
 
+    @overload
+    def max(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> timedelta64: ...
+    @overload
+    def max(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def min(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> timedelta64: ...
+    @overload
+    def min(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+
+    @overload
+    def ptp(
+        self,
+        axis: None | L[0] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+    ) -> timedelta64: ...
+    @overload
+    def ptp(
+        self,
+        axis: None | L[0] = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+    ) -> _ScalarType: ...
+
 class unsignedinteger(integer[_NBit1]):
     # NOTE: `uint64 + signedinteger -> float64`
     def __init__(self, __value: _IntValue = ...) -> None: ...
@@ -3665,6 +4275,47 @@ class unsignedinteger(integer[_NBit1]):
     __rmod__: _UnsignedIntMod[_NBit1]
     __divmod__: _UnsignedIntDivMod[_NBit1]
     __rdivmod__: _UnsignedIntDivMod[_NBit1]
+
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> uint64: ...
+    @overload
+    def prod(
+        self,
+        axis:None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
 
 uint8 = unsignedinteger[_8Bit]
 uint16 = unsignedinteger[_16Bit]
@@ -3737,6 +4388,47 @@ class inexact(number[_NBit1]):  # type: ignore
         dtype: DTypeLike = ...,
         out: _NdArraySubClass = ...,
     ) -> _NdArraySubClass: ...
+
+    @overload
+    def prod(
+        self: _ScalarType,
+        axis: None | L[0] = ...,
+        dtype: None = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def prod(
+        self,
+        axis:None | L[0] = ...,
+        dtype: _DTypeLike[_ScalarType] = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: None = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> Any: ...
+    @overload
+    def prod(
+        self,
+        axis: None | L[0] = ...,
+        dtype: DTypeLike = ...,
+        out: NDArray[_ScalarType] = ...,
+        keepdims: bool = ...,
+        initial: _NumberLike_co = ...,
+        where: _BoolLike_co = ...,
+    ) -> _ScalarType: ...
 
 _IntType = TypeVar("_IntType", bound=integer)
 _FloatType = TypeVar('_FloatType', bound=floating)
