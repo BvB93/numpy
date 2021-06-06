@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import sys
+import enum
 import types
 import hashlib
 import argparse
@@ -24,12 +25,10 @@ from typing import (
 )
 
 import numpy as np
+import numpy.typing as npt
 
 if TYPE_CHECKING:
-    if sys.version_info >= (3, 8):
-        from typing import Literal
-    else:
-        from typing_extensions import Literal
+    from typing_extensions import Literal as L
 
 __all__ = [
     "generate_ufunc_stubs",
@@ -43,7 +42,6 @@ __all__ = [
 
 TEMPLATE = '''"""{hash}"""
 
-import sys
 from typing import (
     TypeVar,
     Any,
@@ -79,6 +77,7 @@ from numpy import (
 from numpy.typing import (
     ArrayLike,
     DTypeLike,
+    NDArray,
     _NestedSequence,
     _SupportsArray,
     _RecursiveSequence,
@@ -102,13 +101,10 @@ from numpy.typing import (
     _DTypeLikeFlexible,
 )
 
-if sys.version_info >= (3, 8):
-    from typing import Literal
-else:
-    from typing_extensions import Literal
+from typing_extensions import Literal
 
 _T = TypeVar("_T")
-_ArrayType = TypeVar("_ArrayType", bound=ndarray[Any, Any])
+_ArrayType = TypeVar("_ArrayType", bound=NDArray[Any])
 _ST1 = TypeVar("_ST1", bound=generic)
 _ST2 = TypeVar("_ST2", bound=generic)
 
@@ -117,11 +113,6 @@ _ScalarOrArray2 = Tuple[
     Union[_ST1, _ST2],
     Union[ndarray[Any, dtype[_ST1]], ndarray[Any, dtype[_ST2]]]
 ]
-
-# In reality this should be a length of list 3 containing an
-# int, an int, and a callable/`None`, but there's no way to express
-# that.
-_ExtObj = List[Union[int, Optional[Callable[[str, int], Any]]]]
 
 _ArrayLikeTD64 = _NestedSequence[_SupportsArray[dtype[timedelta64]]]
 
@@ -132,14 +123,14 @@ KWARGS1: str = (
     "casting: _CastingSafe = ..., "
     "order: _OrderKACF = ..., "
     "subok: bool = ..., "
-    "extobj: _ExtObj = ..., "
-    "where: Optional[_ArrayLikeBool_co] = ..."
+    "extobj: List[Any] = ..., "
+    "where: None | _ArrayLikeBool_co = ..."
 )
 KWARGS2: str = (
     "order: _OrderKACF = ..., "
     "subok: bool = ..., "
-    "extobj: _ExtObj = ..., "
-    "where: Optional[_ArrayLikeBool_co] = ..."
+    "extobj: List[Any] = ..., "
+    "where: None | _ArrayLikeBool_co = ..."
 )
 
 UFUNC_TEMPLATE = """
@@ -147,34 +138,24 @@ UFUNC_TEMPLATE = """
 class {name}(ufunc):
 {overloads}
     @property
-    def __name__(self) -> {cls_name}: ...
+    def __name__(self) -> Literal[{name!r}]: ...
     @property
-    def nin(self) -> {nin}: ...
+    def nin(self) -> Literal[{nin}]: ...
     @property
-    def nout(self) -> {nout}: ...
+    def nout(self) -> Literal[{nout}]: ...
     @property
-    def nargs(self) -> {nargs}: ...
+    def nargs(self) -> Literal[{nargs}]: ...
     @property
-    def ntypes(self) -> {ntypes}: ...
+    def ntypes(self) -> Literal[{ntypes}]: ...
     @property
     def identity(self) -> {identity}: ...
     @property
-    def signature(self) -> {signature}: ...
+    def signature(self) -> Literal[{signature}]: ...
 """
 
 OVERLOAD_TEMPLATE = """
     @overload
     def __call__(self, {input}, out: None = ..., *, dtype: {dtype} = ..., {kwargs}) -> {output}: ...
-""".strip("\n")
-
-OVERLOAD_TEMPLATE_FLEXIBLE = """
-    @overload
-    def __call__(self, {input}, out: None = ..., *, dtype: Any = ..., signature: Any = ..., casting: _Casting = ..., {kwargs}) -> NoReturn: ...
-""".strip("\n")
-
-OVERLOAD_TEMPLATE_RECURSIVE = """
-    @overload
-    def __call__(self, {input}, out: None = ..., *, dtype: Any = ..., signature: Any = ..., casting: _Casting = ..., {kwargs}) -> {output}: ...
 """.strip("\n")
 
 OVERLOAD_TEMPLATE_SIGNATURE = """
@@ -195,7 +176,7 @@ OVERLOAD_TEMPLATE_UNSAFE = """
 
 #: A dictionary that maps `numpy.dtype.kind` to one of the
 #: input parameters in `TEMPLATE`
-KIND_MAPPING_INP: Dict[str, str] = {
+KIND_MAPPING_INP = {
     "b": "_ArrayLikeBool_co",
     "u": "_ArrayLikeUInt_co",
     "i": "_ArrayLikeInt_co",
@@ -208,7 +189,7 @@ KIND_MAPPING_INP: Dict[str, str] = {
 
 #: A dictionary that maps `numpy.dtype.kind` to one of the
 #: `numpy.generic` output types in `TEMPLATE`
-KIND_MAPPING_OUT: Dict[str, str] = {
+KIND_MAPPING_OUT = {
     "b": "bool_",
     "u": "unsignedinteger[Any]",
     "i": "signedinteger[Any]",
@@ -243,19 +224,20 @@ PRIORITY_MAPPING: Dict[str, int] = {
 
 #: A dictionary mapping a priorities to scalar types
 DTYPE_MAPPING = {
-    0: "Optional[_DTypeLikeBool]",
-    1: "Optional[_DTypeLikeUInt]",
-    2: "Optional[_DTypeLikeInt]",
-    3: "Optional[_DTypeLikeFloat]",
-    4: "Optional[_DTypeLikeComplex]",
-    10: "Optional[_DTypeLikeTD64]",
-    100: "Optional[_DTypeLikeDT64]",
-    1000: "Optional[_DTypeLikeObject]",
+    0: "None | _DTypeLikeBool",
+    1: "None | _DTypeLikeUInt",
+    2: "None | _DTypeLikeInt",
+    3: "None | _DTypeLikeFloat",
+    4: "None | _DTypeLikeComplex",
+    10: "None | _DTypeLikeTD64",
+    100: "None | _DTypeLikeDT64",
+    1000: "None | _DTypeLikeObject",
 }
 
-INSERT: Literal[0] = 0
-REPLACE: Literal[1] = 1
-DELETE: Literal[2] = 2
+
+INSERT: L[0] = 0
+REPLACE: L[1] = 1
+DELETE: L[2] = 2
 
 
 class ArgTuple(NamedTuple):
@@ -275,7 +257,7 @@ class CaseTuple(NamedTuple):
     #: * `0`: Insert an element
     #: * `1`: Replace an element
     #: * `2`: Delete an element
-    op: Literal[0, 1, 2]
+    op: L[0, 1, 2]
 
     #: The index in the `ArgTuple` list where `op` is to-be performed
     idx: int
@@ -291,15 +273,19 @@ def _get_special_cases() -> Dict[np.ufunc, List[CaseTuple]]:
     f_in = KIND_MAPPING_INP["f"]
     m_in = KIND_MAPPING_INP["m"]
 
-    i_out = KIND_MAPPING_OUT["i"]
-    f_out = KIND_MAPPING_OUT["f"]
-    m_out = KIND_MAPPING_INP["m"]
-
-    bool11 = ArgTuple(inp=(b_in,), out=(i_out,), dtype="None")
-    bool21 = ArgTuple(inp=(b_in, b_in), out=(i_out,), dtype="None")
-    bool22 = ArgTuple(inp=(b_in, b_in), out=(i_out, i_out), dtype="None")
-    bool11_noreturn = ArgTuple(inp=(b_in,), out=("NoReturn",), dtype="Optional[_DTypeLikeBool]")
-    bool21_noreturn = ArgTuple(inp=(b_in, b_in), out=("NoReturn",), dtype="Optional[_DTypeLikeBool]")
+    bool11 = ArgTuple(inp=(b_in,), out=("int8",), dtype="None")
+    bool21 = ArgTuple(inp=(b_in, b_in), out=("int8",), dtype="None")
+    bool22 = ArgTuple(inp=(b_in, b_in), out=("int8", "int8"), dtype="None")
+    bool11_noreturn = ArgTuple(
+        inp=(b_in,),
+        out=("NoReturn",),
+        dtype="None",
+    )
+    bool21_noreturn = ArgTuple(
+        inp=(b_in, b_in),
+        out=("NoReturn",),
+        dtype="None",
+    )
 
     return {
         # Ufuncs that contain `uu->u`-type signatures but lack `??->i`.
@@ -325,22 +311,38 @@ def _get_special_cases() -> Dict[np.ufunc, List[CaseTuple]]:
 
         # Ufuncs that truly require `timedelta64` and
         # not just timedelta64-like objects
-        np.divmod: [
-            CaseTuple(REPLACE, 3, ArgTuple(inp=("_ArrayLikeTD64", "_ArrayLikeTD64"), out=(i_out, m_out))),
-        ],
+        np.divmod: [CaseTuple(REPLACE, 3, ArgTuple(
+            inp=("_ArrayLikeTD64", "_ArrayLikeTD64"),
+            out=("int64", "timedelta64"),
+        ))],
         np.true_divide: [
-            CaseTuple(REPLACE, 3, ArgTuple(inp=("_ArrayLikeTD64", f_in), out=(m_out,))),
-            CaseTuple(REPLACE, 4, ArgTuple(inp=("_ArrayLikeTD64", "_ArrayLikeTD64"), out=(f_out,))),
+            CaseTuple(REPLACE, 3, ArgTuple(
+                inp=("_ArrayLikeTD64", f_in),
+                out=("timedelta64",),
+            )),
+            CaseTuple(REPLACE, 4, ArgTuple(
+                inp=("_ArrayLikeTD64", "_ArrayLikeTD64"),
+                out=("float64",),
+            )),
             CaseTuple(DELETE, 2),
         ],
         np.floor_divide: [
-            CaseTuple(REPLACE, 5, ArgTuple(inp=("_ArrayLikeTD64", f_in), out=(m_out,))),
-            CaseTuple(REPLACE, 6, ArgTuple(inp=("_ArrayLikeTD64", "_ArrayLikeTD64"), out=(i_out,))),
+            CaseTuple(REPLACE, 5, ArgTuple(
+                inp=("_ArrayLikeTD64", f_in),
+                out=("timedelta64",),
+            )),
+            CaseTuple(REPLACE, 6, ArgTuple(
+                inp=("_ArrayLikeTD64", "_ArrayLikeTD64"),
+                out=("int64",),
+            )),
             CaseTuple(DELETE, 4),
             CaseTuple(INSERT, 0, bool21),
         ],
         np.remainder: [
-            CaseTuple(REPLACE, 3, ArgTuple(inp=("_ArrayLikeTD64", "_ArrayLikeTD64"), out=(m_out,))),
+            CaseTuple(REPLACE, 3, ArgTuple(
+                inp=("_ArrayLikeTD64", "_ArrayLikeTD64"),
+                out=("timedelta64",),
+            )),
         ],
 
         # Ufuncs containing both `OO->?` and `OO->O` signatures;
@@ -370,26 +372,7 @@ def _sort_func(key: ArgTuple) -> int:
 
 
 def parse_types(ufunc: np.ufunc) -> List[ArgTuple]:
-    """Parse the `~numpy.ufunc.types` attribute of the passed ufunc.
-
-    Examples
-    --------
-    .. code:: python
-
-        >>> import numpy as  np
-
-        >>> parse_types(np.add)
-        [ArgTuple(inp=('_BoolLike', '_BoolLike'), out=('bool_',), dtype='Optional[_DTypeLike[bool_]]'),
-         ArgTuple(inp=('_UIntLike', '_UIntLike'), out=('unsignedinteger[Any]',), dtype='Optional[_DTypeLike[unsignedinteger[Any]]]'),
-         ArgTuple(inp=('_IntLike', '_IntLike'), out=('signedinteger[Any]',), dtype='Optional[_DTypeLike[signedinteger[Any]]]'),
-         ArgTuple(inp=('_FloatLike', '_FloatLike'), out=('floating[Any]',), dtype='Optional[_DTypeLike[floating[Any]]]'),
-         ArgTuple(inp=('_ComplexLike', '_ComplexLike'), out=('complexfloating[Any, Any]',), dtype='Optional[_DTypeLike[complexfloating[Any, Any]]]'),
-         ArgTuple(inp=('_TD64Like', '_TD64Like'), out=('timedelta64',), dtype='Optional[_DTypeLike[timedelta64]]'),
-         ArgTuple(inp=('datetime64', '_TD64Like'), out=('datetime64',), dtype='Optional[_DTypeLike[datetime64]]'),
-         ArgTuple(inp=('_TD64Like', 'datetime64'), out=('datetime64',), dtype='Optional[_DTypeLike[datetime64]]'),
-         ArgTuple(inp=('object_', 'object_'), out=('Any',), dtype='Optional[_DTypeLike[object_]]')]
-
-    """
+    """Parse the `~numpy.ufunc.types` attribute of the passed ufunc."""
     ret_set = set()
     for expr in ufunc.types:
         _inp, _out = expr.split("->")
@@ -428,16 +411,10 @@ def _gather_ufuncs(module: types.ModuleType) -> Dict[str, np.ufunc]:
 
 
 def _yield_overloads(
-    type_list: Sequence[ArgTuple], out_type: str
+    type_list: Sequence[ArgTuple],
+    out_type: str,
 ) -> Generator[str, None, None]:
     """Yield a set of overloads for specific to every passed `ArgTuple`."""
-    # An overload for removing `np.flexible`-based array-likes
-    _inp = type_list[0][0]
-    yield OVERLOAD_TEMPLATE_FLEXIBLE.format(
-        input=", ".join(f"__x{i}: _ArrayLikeFlexible_co" for i, _ in enumerate(_inp, 1)),
-        kwargs=KWARGS2,
-    )
-
     # Ufunc-specific overloads
     for _inp, _out, dtype in type_list:
         inp = ", ".join(f"__x{i}: {j}" for i, j in enumerate(_inp, 1))
@@ -451,13 +428,6 @@ def _yield_overloads(
         yield OVERLOAD_TEMPLATE.format(
             input=inp, output=output, dtype=dtype, kwargs=KWARGS1
         )
-
-    # An overload for all >4D array-likes
-    yield OVERLOAD_TEMPLATE_RECURSIVE.format(
-        input=", ".join(f"__x{i}: _RecursiveSequence" for i, _ in enumerate(_inp, 1)),
-        output=f"{out_type}[Any]",
-        kwargs=KWARGS2,
-    )
 
     # An overload for `casting="unsafe"`
     yield OVERLOAD_TEMPLATE_UNSAFE.format(
@@ -487,17 +457,17 @@ def _yield_overloads(
     )
 
 
-def _construct_cls(ufunc: np.ufunc, types_list: Sequence[ArgTuple], name: str) -> str:
+def _construct_cls(ufunc: np.ufunc, types_list: Iterable[ArgTuple]) -> str:
     """Create the main `~numpy.ufunc` subclass and its ``__call__`` method."""
     nout = range(ufunc.nout)
     if ufunc.nout == 1:
-        out_type = "_ScalarOrArray1"
+        out_type = "NDArray"
     elif ufunc.nout == 2:
-        out_type = f"_ScalarOrArray2"
+        out_type = f"_"
     else:
         raise NotImplementedError(f"{ufunc.__name__}.nout > 2")
 
-    signature = f"Literal[{ufunc.signature!r}]" if ufunc.signature is not None else "None"
+    signature = None if ufunc.signature is None else repr(ufunc.signature)
 
     if ufunc.identity is None:
         identity = "None"
@@ -509,12 +479,11 @@ def _construct_cls(ufunc: np.ufunc, types_list: Sequence[ArgTuple], name: str) -
     overloads = _yield_overloads(types_list, out_type)
     return UFUNC_TEMPLATE.format(
         overloads="\n".join(i for i in overloads),
-        name=name,
-        cls_name=f"Literal[{ufunc.__name__!r}]",
-        nin=f"Literal[{ufunc.nin}]",
-        nout=f"Literal[{ufunc.nout}]",
-        nargs=f"Literal[{ufunc.nargs}]",
-        ntypes=f"Literal[{ufunc.ntypes}]",
+        name=ufunc.__name__,
+        nin=ufunc.nin,
+        nout=ufunc.nout,
+        nargs=ufunc.nargs,
+        ntypes=ufunc.ntypes,
         identity=identity,
         signature=signature,
     )
@@ -541,16 +510,6 @@ def _construct_outer(ufunc: np.ufunc, types_list: Iterable[ArgTuple]) -> str:
     return "    outer: Callable[..., Any]  # TODO\n"
 
 
-def _gather_n(ufuncs: Iterable[np.ufunc]) -> np.ndarray:
-    """
-    Identify the largest `~numpy.ufunc.nin`, `~numpy.ufunc.out` and `~numpy.ufunc.nargs`
-    values in a series of ufuncs.
-    """
-    iterator = chain.from_iterable((u.nin, u.nout, u.nargs) for u in ufuncs)
-    array = np.fromiter(iterator, dtype=np.int64).reshape(-1, 3)
-    return array.max(axis=0)
-
-
 def generate_ufunc_stubs(file: IO[str], ufuncs: Mapping[str, np.ufunc]) -> None:
     """Generate a stub file with `~numpy.ufunc`-specific subclasses.
 
@@ -567,10 +526,6 @@ def generate_ufunc_stubs(file: IO[str], ufuncs: Mapping[str, np.ufunc]) -> None:
     with open(__file__, "rb") as f:
         sha256 = hashlib.sha256()
         sha256.update(f.read())
-
-    # Figure out how many type-aliases we for a series
-    # `ufunc.nout` and `ufunc.nargs` values
-    _, nout, nargs = _gather_n(ufuncs.values())
     file.write(TEMPLATE.format(hash=sha256.hexdigest()))
 
     for name, ufunc in ufuncs.items():
@@ -605,7 +560,7 @@ def main() -> None:
     if file is None:
         generate_ufunc_stubs(sys.stdout, ufuncs=_gather_ufuncs(np))
     else:
-        with open(file, "w", encoding="utf8") as f:
+        with open(file, "w") as f:
             generate_ufunc_stubs(f, ufuncs=_gather_ufuncs(np))
 
 
