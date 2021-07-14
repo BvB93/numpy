@@ -3,6 +3,10 @@ This file tests the generic aspects of ArrayMethod.  At the time of writing
 this is private API, but when added, public API may be added here.
 """
 
+import sys
+import types
+from typing import Any, Type
+
 import pytest
 
 import numpy as np
@@ -56,3 +60,15 @@ class TestSimpleStridedCall:
         # This is private API, which may be modified freely
         with pytest.raises(error):
             self.method._simple_strided_call(*args)
+
+
+@pytest.mark.parametrize(
+    "array_type", [np.ndarray, np.recarray, np.chararray, np.matrix, np.memmap]
+)
+def test_class_getitem(self, cls: Type[np.ndarray]) -> None:
+    """Test `ndarray.__class_getitem__`."""
+    if sys.version_info >= (3, 9):
+        assert isinstance(array_type[Any, Any], types.GenericAlias)
+    else:
+        with pytest.raises(TypeError):
+            array_type[Any, Any]

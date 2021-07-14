@@ -1585,7 +1585,7 @@ add_newdoc('numpy.core.multiarray', 'arange',
     For integer arguments the function is equivalent to the Python built-in
     `range` function, but returns an ndarray rather than a list.
 
-    When using a non-integer step, such as 0.1, it is often better to use 
+    When using a non-integer step, such as 0.1, it is often better to use
     `numpy.linspace`. See the warnings section below for more information.
 
     Parameters
@@ -2199,8 +2199,8 @@ add_newdoc('numpy.core.multiarray', 'ndarray',
     empty : Create an array, but leave its allocated memory unchanged (i.e.,
             it contains "garbage").
     dtype : Create a data-type.
-    numpy.typing.NDArray : A :term:`generic <generic type>` version
-                           of ndarray.
+    numpy.typing.NDArray : An ndarray alias :term:`generic <generic type>`
+                           w.r.t. its `dtype.type <numpy.dtype.type>`.
 
     Notes
     -----
@@ -2788,6 +2788,37 @@ add_newdoc('numpy.core.multiarray', 'ndarray', ('__copy__',
     Used if :func:`copy.copy` is called on an array. Returns a copy of the array.
 
     Equivalent to ``a.copy(order='K')``.
+
+    """))
+
+
+add_newdoc('numpy.core.multiarray', 'ndarray', ('__class_getitem__',
+    """a.__class_getitem__(item, /)
+
+    Return a parametrized wrapper around the `~numpy.ndarray` type.
+
+    Requires python >= 3.9.
+
+    .. versionadded:: 1.22
+
+    Returns
+    -------
+    alias : types.GenericAlias
+        A parametrized `~numpy.ndarray` type.
+
+    Examples
+    --------
+    >>> from typing import Any
+    >>> import numpy as np
+
+    >>> np.ndarray[Any, np.dtype]
+    numpy.ndarray[typing.Any, numpy.dtype]
+
+    See Also
+    --------
+    :pep:`585` : Type hinting generics in standard collections.
+    numpy.typing.NDArray : An ndarray alias :term:`generic <generic type>`
+                           w.r.t. its `dtype.type <numpy.dtype.type>`.
 
     """))
 

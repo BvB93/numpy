@@ -1808,6 +1808,19 @@ array_reduce_ex_regular(PyArrayObject *self, int NPY_UNUSED(protocol))
 }
 
 static PyObject *
+array_cls_getitem(PyObject *cls, PyObject *args)
+{
+#ifdef Py_GENERICALIASOBJECT_H
+    return Py_GenericAlias(cls, args);
+#else
+    PyErr_Format(PyExc_TypeError,
+                 "'%.200s' object is not subscriptable",
+                 Py_TYPE(cls)->tp_name);
+    return NULL;
+#endif
+}
+
+static PyObject *
 array_reduce_ex_picklebuffer(PyArrayObject *self, int protocol)
 {
     PyObject *numeric_mod = NULL, *from_buffer_func = NULL;
@@ -2753,6 +2766,11 @@ NPY_NO_EXPORT PyMethodDef array_methods[] = {
     {"__format__",
         (PyCFunction) array_format,
         METH_VARARGS, NULL},
+
+    /* for typing */
+    {"__class_getitem__",
+        (PyCFunction)array_cls_getitem,
+        METH_CLASS | METH_O, NULL},
 
     /* Original and Extended methods added 2005 */
     {"all",
